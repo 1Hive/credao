@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bull": "^3.10.0",
     "grant-koa": "^4.6.3",
     "isomorphic-unfetch": "^3.0.0",
     "koa": "^2.8.1",
