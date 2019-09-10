@@ -1,0 +1,31 @@
+{
+  "name": "credao",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": ". ./.env-dev && next",
+    "build": "next build",
+    "start": ". ./.env-prod && NODE_ENV=production next start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "grant-koa": "^4.6.3",
+    "isomorphic-unfetch": "^3.0.0",
+    "koa": "^2.8.1",
+    "koa-qs": "^2.0.0",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.12.3",
+    "next": "^9.0.5",
+    "next-github-auth": "^0.2.4",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-markdown": "^4.2.2",
+    "sourcecred": "^0.4.0"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.1"
+  }
+}
