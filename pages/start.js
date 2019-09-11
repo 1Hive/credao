@@ -2,11 +2,20 @@ import React, { useState, useEffect } from 'react'
 import { PrivatePage } from 'next-github-auth'
 import Layout from '../components/Layout';
 import Repos from '../components/Repos';
+import CredList from '../components/CredList';
 import fetch from 'isomorphic-unfetch';
 import parseLinkHeader from 'parse-link-header';
 const STARTED = "started"
 const COMPLETED = "completed"
 const FAILED = "failed"
+
+const hasCred = {backgroundColor: "green", marginRight: "10px", padding: "4px"}
+const waitingCred = {backgroundColor: "yellow", marginRight: "10px", padding: "4px"}
+
+const Selected = props =>
+  <span style={props.cred ? hasCred : waitingCred}>
+    {props.name}
+  </span>
 
 const Start = props => {
   const [selected, setSelected] = useState([])
@@ -26,9 +35,12 @@ const Start = props => {
 
   return (
     <Layout user={props.user}>
-      <p>{selected.map(r=><span key={r.id} style={r.cred ? {backgroundColor: "green"} : {}}>{r.name}</span>)}</p>
-      <button onClick={()=>attachCreds(selected, setChanged)}>submit</button>
-      <Repos repos={repos} onSelect={(r)=>{r.selected=!r.selected; setChanged(r)}} />
+      <p>{selected.map(r=><Selected key={r.id} {...r}/>)}</p>
+      <h3>Repos:</h3>
+      <div style={{display: "flex"}}>
+        <Repos repos={repos} onSelect={(r)=>{r.selected=!r.selected; setChanged(r); if(!r.cred) attachCred(r, setChanged)}} />
+        <CredList repos={selected.filter(s=>s.cred)} />
+      </div>
     </Layout>
   )
 }
@@ -60,18 +72,20 @@ async function getJSON(url, token){
   return {next: link.next && link.next.url, data: await res.json()}
 }
 
-async function attachCreds(repos, setChanged){
-  let all = await Promise.all(
-    repos.map(async (r)=>{
-      const cred = await getCred(r.id)
-      r.cred = cred
-      setChanged(r)
-      return r
-    }
-  ))
+async function attachCred(repo, setChanged){
+  // let all = await Promise.all(
+  //   repos.map(async (r)=>{
+  //     const cred = await getCred(r.id)
+  //     r.cred = cred
+  //     setChanged(r)
+  //     return r
+  //   }
+  // ))
   // const creds = await Promise.all(res.map(r=>r.json()))
 
-  console.log(all)
+  const cred = await getCred(repo.id)
+  repo.cred = cred
+  setChanged(repo)
 }
 
 async function getCred(id){

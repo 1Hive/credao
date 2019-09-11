@@ -16,7 +16,6 @@ const repoBox = {
 
 const Repos = props =>
   <React.Fragment>
-    <h3>Repos:</h3>
     <div style={repoBox}>
       {props.repos.map(r=><Repo {...r} key={r.id} toggle={()=>props.onSelect(r)} />)}
     </div>
