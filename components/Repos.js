@@ -26,7 +26,7 @@ const Repos = props => {
 export default Repos
 
 async function initReport(ids){
-  const params = getQueryString({id:ids})
   let res = await Promise.all(ids.map(id=>fetch(`/api/cred/${id}`)))
+  res = await Promise.all(res.map(r=>r.json()))
   console.log(res)
 }
