@@ -1,14 +1,28 @@
 const fs = require('fs')
+const { mkdirp } = require('fs-extra')
 const { promisify } = require('util')
-const writeFile = promisify(fs.writeFile)
-const mkdirp = promisify(require('mkdirp'))
+const fetch = require('isomorphic-unfetch');
 const sleep = promisify(setTimeout)
+const exec = promisify(require('child_process').exec);
 
 module.exports = async function(job, done){
-  // Do some heavy work
-  const repo = job.data.repo
-  await sleep(10000)
-  await mkdirp(`${process.env.PWD}/data/repos/${repo}`)
-  writeFile(`${process.env.PWD}/data/repos/${repo}/cred.json`, JSON.stringify({repo, peaches: "awesome"}))
-  done(null, {repo: job.data.repo})
+  const id = job.data.id
+  const githubToken = job.data.githubToken
+
+  const res = await fetch(`https://api.github.com/repositories/${id}`, { headers: { 'Authorization': `token ${githubToken}` } })
+  const repo = await res.json()
+
+  const dir = `${process.env.REPO_DIR}/${id}`
+  await mkdirp(dir)
+
+  let cmd = `export SOURCECRED_DIRECTORY=${dir} && export SOURCECRED_GITHUB_TOKEN=${githubToken} && node ${process.env.PWD}/node_modules/sourcecred/bin/sourcecred load ${repo.full_name}`
+
+  console.log(cmd)
+  // Do work here
+  const { stdout, stderr } = await exec(cmd);
+  console.log('\n\nstdout:\n', stdout);
+  console.log('\n\nstderr:\n', stderr);
+
+  // writeFile(`${process.env.PWD}/data/repos/${id}/cred.json`, JSON.stringify({id, peaches: "awesome"}))
+  done(null, {id: job.data.id})
 }

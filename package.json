@@ -13,12 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "bull": "^3.10.0",
-    "grant-koa": "^4.6.3",
+    "fs-extra": "^8.1.0",
     "isomorphic-unfetch": "^3.0.0",
-    "koa": "^2.8.1",
-    "koa-qs": "^2.0.0",
-    "koa-router": "^7.4.0",
-    "koa-session": "^5.12.3",
     "mkdirp": "^0.5.1",
     "next": "^9.0.5",
     "next-github-auth": "^0.2.4",
