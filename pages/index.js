@@ -1,13 +1,10 @@
-import { PublicPage } from 'next-github-auth'
+// import { PrivatePage } from 'next-github-auth'
 import Layout from '../components/Layout';
 import Link from 'next/link';
 
 const Index = (props) =>
-  <Layout>
+  <div>
     <p>This is the home page</p>
-    <Link href="/start">
-      <button>Start here</button>
-    </Link>
-  </Layout>
+  </div>
 
-export default PublicPage(Index)
+export default Index

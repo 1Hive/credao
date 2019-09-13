@@ -4,3 +4,4 @@ stash/
 node_modules/
 data/
 package-lock.json
+*.pem

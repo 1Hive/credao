@@ -4,25 +4,37 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": ". ./.env-dev && next",
+    "dev": ". ./.env && node server.js",
     "build": "next build",
-    "start": ". ./.env-prod && NODE_ENV=production next start"
+    "start": ". ./.env && NODE_ENV=production node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aragon/os": "^4.3.0",
+    "bignumber.js": "^9.0.0",
     "bull": "^3.10.0",
+    "csvtojson": "^2.0.10",
+    "ethereumjs-util": "^6.1.0",
+    "ethers": "^4.0.37",
     "fs-extra": "^8.1.0",
+    "hash.js": "^1.1.7",
+    "ipfs-http-client": "^36.0.0",
     "isomorphic-unfetch": "^3.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.2.1",
+    "merkle-tree-solidity": "^1.0.8",
     "mkdirp": "^0.5.1",
     "next": "^9.0.5",
     "next-github-auth": "^0.2.4",
+    "nookies": "^2.0.8",
     "parse-link-header": "^1.0.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-markdown": "^4.2.2",
-    "sourcecred": "^0.4.0"
+    "sourcecred": "^0.4.0",
+    "styled-components": "^5.0.0-beta.8"
   },
   "devDependencies": {
     "cross-env": "^5.2.1"
