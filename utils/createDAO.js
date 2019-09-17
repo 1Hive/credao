@@ -5,7 +5,7 @@ const templateAddress = "0xD13a7D8A728692eB2c56135B5EB5A1951b3F8395"
 const SAMPLE_PRIVATE_KEY = "a8a54b2d8197bc0b19bb8a084031be71835580a01e70a45a13babd16c9bc1563"
 const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
 const airdropAppId = "0x9de6599338eae7c86e73fdfe876b54eb1c3c4c67db74ee25a60bc07f72576feb"
-import merklizeDistribution from './merklizeDistribution'
+import merklize from './merklize'
 import ipfsClient from 'ipfs-http-client'
 
 async function createDAO(id, name, cred, createCallback, statusCallback){
@@ -41,7 +41,7 @@ async function airdrop(airdropper, cred, statusCallback){
   statusCallback("airdropping cred")
 
   let withDummyAddresses = cred.map((c,i)=>({address: (ethers.Wallet.fromMnemonic(SAMPLE_MNEMONIC, `m/44'/60'/${i}'/0/0`)).address, points: c.cred}))
-  let merklized = merklizeDistribution("some_id", withDummyAddresses)
+  let merklized = merklize("some_id", withDummyAddresses)
 
   let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
   let res = await ipfs.add(Buffer.from(JSON.stringify(merklized), 'utf8'))

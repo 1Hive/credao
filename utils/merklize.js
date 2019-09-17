@@ -7,7 +7,7 @@ const BigNumber = require('bignumber.js');
 
 const decimals = BigNumber(10).pow(18)
 
-function merklizeDistribution(id, recipients) {
+export default function(id, recipients) {
   recipients = recipients.reduce((prev, curr)=>{
     let address = curr.address
     let existing = prev.find(u=>u.address===address)
@@ -41,5 +41,3 @@ function merklizeDistribution(id, recipients) {
 
   return {id, root, data: recipients}
 }
-
-export default merklizeDistribution
