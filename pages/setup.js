@@ -26,7 +26,6 @@ const Setup = props => {
     <div>
       <Header user={props.user} />
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
-      <p>{props.githubToken}</p>
       <p>{JSON.stringify(cred)}</p>
     </div>
   )

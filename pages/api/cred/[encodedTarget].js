@@ -15,6 +15,7 @@ export default async(req, res) => {
     resData = {data: await collateCred(encodedTarget)}
   } catch(e){
     console.log(e)
+    // ensure no existing task
     let job = await req.runner.addJob('collectCred', {target, githubToken})
     // let job = await boss.publishOnce(COLLECT_CRED_QUEUE, {target, githubToken}, null, target)
     resData = {job, data: null}
@@ -26,16 +27,14 @@ export default async(req, res) => {
 }
 
 async function collateCred(encodedTarget){
-  const cred = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${encodedTarget}/cred.json`))
-  // console.log("cred", cred)
+  const data = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${encodedTarget}/cred.json`))
   const credMap = {}
-  const addressToCred = cred[1].credJSON.addressToCred
-  for (let user in addressToCred){
+  const cred = data[1].credJSON
+  for (let user in cred){
     let nameArr = user.split('\0')
     if(!nameArr.includes('USER')) continue
     let name = nameArr[nameArr.length-2]
-    credMap[name] = addressToCred[user].reduce((a, b) => a + b, 0)
+    credMap[name] = cred[user].reduce((a, b) => a + b, 0)
   }
-  // console.log("credMap", credMap)
   return Object.keys(credMap).map(u=>({name: u, cred: credMap[u]}))
 }

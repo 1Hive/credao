@@ -24,6 +24,7 @@ export async function getInstallation({user, githubId}){
   const installation = await createInstallation({user, githubId})
 
   const installationUser = await createInstallationUser({userId: installation.creatorId, installationId: installation.id})
+  console.log("installationUser", installationUser)
 
   return installation
 }
@@ -32,7 +33,7 @@ async function createInstallationUser({userId, installationId}){
 
   let query = `
   mutation {
-    createInstallationUser( input: { installationUser: { userId: 1, installationId: 1 } } ) {
+    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId} } } ) {
       installationUser {
         userId
         installationId
@@ -40,6 +41,9 @@ async function createInstallationUser({userId, installationId}){
       }
     }
   }`
+
+  let resData = await gqlQuery(query)
+  return resData.data.createInstallationUser.installationUser
 
 }
 
@@ -53,9 +57,9 @@ async function createInstallation({user, githubId}){
     }
   })
   let ghToken = (await data.json()).token
-  console.log(ghToken)
+  console.log("installation token", ghToken)
   let repos = await getInstallationRepos(ghToken)
-  console.log(repos)
+
   let name, target
   if(!repos.length) {
     return null
@@ -83,6 +87,7 @@ async function createInstallation({user, githubId}){
         id
         name
         target
+        creatorId
       }
     }
   }`
@@ -93,7 +98,6 @@ async function createInstallation({user, githubId}){
 }
 
 async function getInstallationRepos(ghToken){
-  // console.log(token)
   let repos = []
   let url = GH_INSTALLATION_REPOS_URL
   while(!!url){
