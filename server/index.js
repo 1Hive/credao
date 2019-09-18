@@ -3,10 +3,10 @@ const session = require('express-session')
 const next = require('next')
 const { postgraphile } = require('postgraphile')
 const PgManyToManyPlugin = require("@graphile-contrib/pg-many-to-many");
-const { run } = require('graphile-worker')
-const { GH_OAUTH_URL } = require('../utils/constants')
-// const { startBoss } = require('./queue')
-// const collectCred = require('../processors/collectCred')
+const { COLLECT_CRED_QUEUE, GH_OAUTH_URL } = require('../utils/constants')
+const PgBoss = require('pg-boss')
+const boss = new PgBoss(process.env.DATABASE_URL)
+const collectCred = require('../tasks/collectCred')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -16,16 +16,15 @@ main()
 
 async function main(){
   // await startBoss()
-  const runner = await run({
-    connectionString: process.env.DATABASE_URL,
-    taskDirectory: `${__dirname}/../tasks`,
-  })
+
+  await boss.start()
+  await boss.subscribe(COLLECT_CRED_QUEUE, collectCred)
 
   await app.prepare()
   const server = express()
 
   server.use('/api', (req,res,next)=>{
-    req.runner = runner
+    req.boss = boss
     next()
   })
 

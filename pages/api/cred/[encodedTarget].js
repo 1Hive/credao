@@ -1,7 +1,7 @@
 const hash = require('hash.js')
 const { readFile, readdir } = require('fs-extra')
 const base64url = require("base64url")
-// const { boss, COLLECT_CRED_QUEUE } = require('../../../server/queue')
+const { COLLECT_CRED_QUEUE } = require('../../../utils/constants')
 
 export default async(req, res) => {
   const encodedTarget = req.query['encodedTarget']
@@ -15,9 +15,7 @@ export default async(req, res) => {
     resData = {data: await collateCred(encodedTarget)}
   } catch(e){
     console.log(e)
-    // ensure no existing task
-    let job = await req.runner.addJob('collectCred', {target, githubToken})
-    // let job = await boss.publishOnce(COLLECT_CRED_QUEUE, {target, githubToken}, null, target)
+    let job = await req.boss.publishOnce(COLLECT_CRED_QUEUE, {target, githubToken}, null, target)
     resData = {job, data: null}
   }
 

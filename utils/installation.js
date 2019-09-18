@@ -29,6 +29,26 @@ export async function getInstallation({user, githubId}){
   return installation
 }
 
+export async function getUserInstallationsByUserId(userId){
+  let query = `
+  query {
+    userById(id: ${userId}) {
+      id
+      installationsByInstallationUserUserIdAndInstallationId {
+        nodes {
+          id
+          name
+          target
+        }
+      }
+    }
+  }
+  `
+
+  let resData = await gqlQuery(query)
+  return resData.data.userById.installationsByInstallationUserUserIdAndInstallationId.nodes
+}
+
 async function createInstallationUser({userId, installationId}){
 
   let query = `

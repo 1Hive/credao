@@ -26,7 +26,6 @@
     "ethers": "^4.0.37",
     "express-session": "^1.16.2",
     "fs-extra": "^8.1.0",
-    "graphile-worker": "0.1.0-alpha.0",
     "ipfs-http-client": "^36.0.0",
     "isomorphic-unfetch": "^3.0.0",
     "jsonwebtoken": "^8.5.1",

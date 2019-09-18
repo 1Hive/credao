@@ -2,5 +2,6 @@
   "GH_OAUTH_URL": "https://github.com/login/oauth/authorize",
   "GH_ACCESS_TOKEN_URL": "https://github.com/login/oauth/access_token",
   "GH_USER_URL": "https://api.github.com/user",
-  "GH_INSTALLATION_REPOS_URL": "https://api.github.com/installation/repositories"
+  "GH_INSTALLATION_REPOS_URL": "https://api.github.com/installation/repositories",
+  "COLLECT_CRED_QUEUE": "collect-cred"
 }

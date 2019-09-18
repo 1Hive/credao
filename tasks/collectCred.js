@@ -2,10 +2,7 @@ const { mkdirp } = require('fs-extra')
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec);
 
-module.exports = async function(data){
-  const target = data.target
-  const githubToken = data.githubToken
-
+module.exports = async function({data: {target, githubToken}}){
   const dir = `${process.env.SOURCECRED_OUTPUT}`
   await mkdirp(dir)
 
