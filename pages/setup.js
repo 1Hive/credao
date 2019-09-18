@@ -10,7 +10,6 @@ import Header from '../components/Header'
 const Setup = props => {
   const [cred, setCred] = useState()
   const [dao, setDao] = useState(props.installation && props.installation.dao)
-  const [status, setStatus] = useState()
 
   useEffect(()=>{
     if(props.installation)
@@ -18,15 +17,18 @@ const Setup = props => {
   }, [])
 
   useEffect(()=>{
-    if(cred && !dao)
-      console.log("create dao")
-  }, [cred])
+    console.log("setDao", dao)
+    //save dao to installation
+  }, [dao])
 
   return (
     <div>
       <Header user={props.user} />
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
-      <p>{JSON.stringify(cred)}</p>
+      <button onClick={()=>createDAO({userId: props.user.id, installationId: props.installation.id}, setDao)}>create dao</button>
+      {dao && <a target="_blank" href={`http://localhost:3000/#/${dao}`}>dao for {props.installation.name}</a>}
+      {cred && <p>{JSON.stringify(cred)}</p>}
+      {cred && <button>assign cred to dao</button>}
     </div>
   )
 }

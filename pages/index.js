@@ -7,10 +7,13 @@ const Index = (props) =>
     <Header user={props.user} />
     <p>{props.user ? `Welcome, ${props.user.username}` : `please login`}</p>
     <p>This is the home page</p>
-    {props.installations.length && <React.Fragment>
-      <p>Your organizations:</p>
-      <ul>{props.installations.map(i=><li key={i.id}>{i.name}</li>)}</ul>
-    </React.Fragment>}
+    {props.installations.length ?
+      <React.Fragment>
+        <p>Your organizations:</p>
+        <ul>{props.installations.map(i=><li key={i.id}>{i.name}</li>)}</ul>
+      </React.Fragment>
+      : null
+    }
   </div>
 
 Index.getInitialProps = async function(ctx) {

@@ -16,7 +16,11 @@ export async function timeout(ms){
 }
 
 export async function gqlQuery(query){
-  let res = await fetch(`${process.env.BASE_URL}/graphql`, {
+  let baseURL = ''
+  if(typeof window === "undefined")
+    baseURL = process.env.BASE_URL
+
+  let res = await fetch(`${baseURL}/graphql`, {
     method: "POST",
     headers: {"Content-Type": "application/json", "Accept": "application/json"},
     body: JSON.stringify({query})

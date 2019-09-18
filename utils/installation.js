@@ -1,6 +1,8 @@
 import fetch from 'isomorphic-unfetch'
 import githubJWT from './githubJWT'
 import parseLinkHeader from 'parse-link-header'
+import { ethers } from "ethers"
+const SAMPLE_PRIVATE_KEY = "a8a54b2d8197bc0b19bb8a084031be71835580a01e70a45a13babd16c9bc1563"
 import { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } from './constants'
 import { gqlQuery } from './'
 
@@ -29,6 +31,23 @@ export async function getInstallation({user, githubId}){
   return installation
 }
 
+export async function getUserInstallation({userId, installationId}){
+  let query = `
+  query {
+    installationUserByInstallationIdAndUserId(userId: ${userId}, installationId: ${installationId}) {
+      address
+      autoKey
+      installationByInstallationId {
+        name
+      }
+    }
+  }
+  `
+
+  let resData = await gqlQuery(query)
+  return resData.data.installationUserByInstallationIdAndUserId
+}
+
 export async function getUserInstallationsByUserId(userId){
   let query = `
   query {
@@ -50,21 +69,31 @@ export async function getUserInstallationsByUserId(userId){
 }
 
 async function createInstallationUser({userId, installationId}){
+  const wallet = ethers.Wallet.createRandom()
 
   let query = `
   mutation {
-    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId} } } ) {
+    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId}, autoKey: "${wallet.privateKey}" } } ) {
       installationUser {
         userId
         installationId
         address
+        autoKey
       }
     }
   }`
 
   let resData = await gqlQuery(query)
+  await gasTopup(wallet.address)
   return resData.data.createInstallationUser.installationUser
+}
 
+async function gasTopup(to){
+  let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
+  let wallet = (new ethers.Wallet(SAMPLE_PRIVATE_KEY)).connect(provider)
+  let value = ethers.utils.parseEther('0.1');
+  let tx = await wallet.sendTransaction({ to, value });
+  await tx.wait()
 }
 
 async function createInstallation({user, githubId}){

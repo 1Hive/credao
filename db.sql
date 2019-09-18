@@ -21,7 +21,7 @@ CREATE TRIGGER users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROC
 CREATE TABLE IF NOT EXISTS installations (
   id SERIAL PRIMARY KEY,
   github_id INTEGER NOT NULL UNIQUE,
-  name VARCHAR,
+  name VARCHAR NOT NULL UNIQUE,
   github_token VARCHAR,
   target VARCHAR,
   dao VARCHAR,
@@ -36,6 +36,7 @@ CREATE TABLE IF NOT EXISTS installation_users (
   installation_id INTEGER REFERENCES installations(id),
   user_id INTEGER REFERENCES users(id),
   address VARCHAR,
+  auto_key VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT installation_users_pkey PRIMARY KEY (installation_id, user_id)
