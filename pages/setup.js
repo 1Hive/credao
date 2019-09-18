@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getCred } from '../utils'
 import { auth } from '../utils/auth'
-import { getInstallation } from '../utils/installation'
+import { getInstallation, updateInstallationDAO } from '../utils/installation'
 import fetch from 'isomorphic-unfetch'
 import createDAO from '../utils/createDAO'
 import Loading from '../components/Loading'
@@ -16,17 +16,12 @@ const Setup = props => {
       getCred({target: props.installation.target, githubToken: props.githubToken}).then(setCred)
   }, [])
 
-  useEffect(()=>{
-    console.log("setDao", dao)
-    //save dao to installation
-  }, [dao])
-
   return (
     <div>
       <Header user={props.user} />
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
       <button onClick={()=>createDAO({userId: props.user.id, installationId: props.installation.id}, setDao)}>create dao</button>
-      {dao && <a target="_blank" href={`http://localhost:3000/#/${dao}`}>dao for {props.installation.name}</a>}
+      {dao && <p><a target="_blank" href={`http://localhost:3000/#/${dao}`}>dao for {props.installation.name}</a></p>}
       {cred && <p>{JSON.stringify(cred)}</p>}
       {cred && <button>assign cred to dao</button>}
     </div>

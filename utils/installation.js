@@ -97,7 +97,6 @@ async function gasTopup(to){
 }
 
 async function createInstallation({user, githubId}){
-
   let data = await fetch(`https://api.github.com/app/installations/${githubId}/access_tokens`, {
     method: "POST",
     headers: {
@@ -143,7 +142,19 @@ async function createInstallation({user, githubId}){
 
   let resData = await gqlQuery(query)
   return resData.data.createInstallation.installation
+}
 
+export async function updateInstallationDAO({id, dao}){
+  let query = `
+  mutation {
+    updateInstallationById(input: {installationPatch: {dao: "${dao}"}, id: ${id}}) {
+      clientMutationId
+    }
+  }
+  `
+
+  let resData = await gqlQuery(query)
+  return resData.data.updateInstallationById.installation
 }
 
 async function getInstallationRepos(ghToken){

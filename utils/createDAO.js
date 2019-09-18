@@ -1,7 +1,7 @@
 import { abi as TemplateABI } from "../../1hive/airdrop/build/contracts/Template.json"
 import { abi as AirdropABI } from "../../1hive/airdrop/build/contracts/Airdrop.json"
 import { ethers } from "ethers"
-import { getUserInstallation } from "./installation"
+import { getUserInstallation, updateInstallationDAO } from "./installation"
 const templateAddress = "0xD13a7D8A728692eB2c56135B5EB5A1951b3F8395"
 const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
 const airdropAppId = "0x9de6599338eae7c86e73fdfe876b54eb1c3c4c67db74ee25a60bc07f72576feb"
@@ -19,9 +19,10 @@ async function createDAO({userId, installationId}, createCallback){
   let template = new ethers.Contract(templateAddress, TemplateABI, wallet)
 
   let deployDaoEvent = template.filters.DeployDao()
-  template.on(deployDaoEvent, (dao, e)=>{
+  template.on(deployDaoEvent, async (dao, e)=>{
     console.log("deployDaoEvent", dao)
     if(e.transactionHash === tx.hash){
+      await updateInstallationDAO({id: installationId, dao})
       createCallback(dao)
     }
   })
