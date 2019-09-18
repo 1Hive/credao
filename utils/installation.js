@@ -39,12 +39,14 @@ export async function getUserInstallation({userId, installationId}){
       autoKey
       installationByInstallationId {
         name
+        dao
       }
     }
   }
   `
 
   let resData = await gqlQuery(query)
+  console.log(resData)
   return resData.data.installationUserByInstallationIdAndUserId
 }
 

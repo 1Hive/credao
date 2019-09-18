@@ -3,27 +3,33 @@ import { getCred } from '../utils'
 import { auth } from '../utils/auth'
 import { getInstallation, updateInstallationDAO } from '../utils/installation'
 import fetch from 'isomorphic-unfetch'
-import createDAO from '../utils/createDAO'
+import { createDAO, airdrop }  from '../utils/createDAO'
 import Loading from '../components/Loading'
 import Header from '../components/Header'
 
 const Setup = props => {
   const [cred, setCred] = useState()
   const [dao, setDao] = useState(props.installation && props.installation.dao)
+  const [creatingDAO, setCreatingDAO] = useState()
 
   useEffect(()=>{
     if(props.installation)
       getCred({target: props.installation.target, githubToken: props.githubToken}).then(setCred)
   }, [])
 
+  useEffect(()=>{
+    if(dao) setCreatingDAO()
+  }, [dao])
+
   return (
     <div>
       <Header user={props.user} />
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
-      <button onClick={()=>createDAO({userId: props.user.id, installationId: props.installation.id}, setDao)}>create dao</button>
-      {dao && <p><a target="_blank" href={`http://localhost:3000/#/${dao}`}>dao for {props.installation.name}</a></p>}
+      {!dao && !creatingDAO && <button onClick={()=>{createDAO({userId: props.user.id, installationId: props.installation.id}, setDao); setCreatingDAO(true)}}>create dao</button>}
+      {creatingDAO && <Loading>creating dao</Loading>}
+      {dao && <p><a target="_blank" href={`http://localhost:3000/#/${dao}`}>{props.installation.name} dao</a></p>}
       {cred && <p>{JSON.stringify(cred)}</p>}
-      {cred && <button>assign cred to dao</button>}
+      {dao && cred && <button onClick={()=>{airdrop({cred, userId: props.user.id, installationId: props.installation.id})}}>airdrop cred</button>}
     </div>
   )
 }
