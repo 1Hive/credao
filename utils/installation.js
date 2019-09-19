@@ -60,6 +60,7 @@ export async function getUserInstallationsByUserId(userId){
           id
           name
           target
+          dao
         }
       }
     }

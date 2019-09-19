@@ -6,6 +6,7 @@ import fetch from 'isomorphic-unfetch'
 import { createDAO, airdrop }  from '../utils/createDAO'
 import Loading from '../components/Loading'
 import Header from '../components/Header'
+import DAOLink from '../components/DAOLink'
 
 const Setup = props => {
   const [cred, setCred] = useState()
@@ -27,7 +28,7 @@ const Setup = props => {
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
       {!dao && !creatingDAO && <button onClick={()=>{createDAO({userId: props.user.id, installationId: props.installation.id}, setDao); setCreatingDAO(true)}}>create dao</button>}
       {creatingDAO && <Loading>creating dao</Loading>}
-      {dao && <p><a target="_blank" href={`http://localhost:3000/#/${dao}`}>{props.installation.name} dao</a></p>}
+      {dao && <p><DAOLink dao={dao}/></p>}
       {cred && <p>{JSON.stringify(cred)}</p>}
       {dao && cred && <button onClick={()=>{airdrop({cred, userId: props.user.id, installationId: props.installation.id})}}>airdrop cred</button>}
     </div>

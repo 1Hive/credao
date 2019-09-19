@@ -1,6 +1,10 @@
 import Header from '../components/Header'
+import DAOLink from '../components/DAOLink'
 import { auth } from '../utils/auth'
 import { getUserInstallationsByUserId } from '../utils/installation'
+
+const Installation = (props) =>
+  <tr><td>{props.name}</td><td>{props.dao && <DAOLink dao={props.dao}/>}</td></tr>
 
 const Index = (props) =>
   <div>
@@ -10,7 +14,7 @@ const Index = (props) =>
     {props.installations.length ?
       <React.Fragment>
         <p>Your organizations:</p>
-        <ul>{props.installations.map(i=><li key={i.id}>{i.name}</li>)}</ul>
+        <table><tbody>{props.installations.map(i=><Installation key={i.id} {...i}/>)}</tbody></table>
       </React.Fragment>
       : null
     }

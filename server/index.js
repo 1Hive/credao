@@ -44,6 +44,8 @@ async function main(){
     appendPlugins: [PgManyToManyPlugin]
   }))
 
+  server.use("/dao", express.static(`${process.env.PWD}/node_modules/aragon/build`));
+
   server.get('/sign-in', (req, res)=>{
     res.redirect(`${GH_OAUTH_URL}?client_id=${process.env.GITHUB_CLIENT_ID}&redirect_uri=http://localhost:4000/setup`)
   })
