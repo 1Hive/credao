@@ -7,7 +7,7 @@ const BigNumber = require('bignumber.js');
 
 const decimals = BigNumber(10).pow(18)
 
-export default function(id, recipients) {
+export default function(id, recipients, start, end) {
   recipients = recipients.reduce((prev, curr)=>{
     let address = curr.address
     let existing = prev.find(u=>u.address===address)
@@ -39,5 +39,5 @@ export default function(id, recipients) {
 
   console.log(`root:`, root)
 
-  return {id, root, data: recipients}
+  return {id, root, data: recipients, start, end}
 }

@@ -1,12 +1,12 @@
 import base64url from 'base64url'
 import fetch from 'isomorphic-unfetch'
 
-export async function getCred({target, githubToken}){
-  let res = await fetch(`/api/cred/${base64url(target)}?githubToken=${githubToken}`)
+export async function getCred({installationId, githubToken}){
+  let res = await fetch(`/api/cred/${installationId}?githubToken=${githubToken}`)
   res = await res.json()
   if(res.job){
     await timeout(10000)
-    return await getCred({target, githubToken})
+    return await getCred({installationId, githubToken})
   } else
     return res.data
 }

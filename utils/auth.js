@@ -64,8 +64,7 @@ export async function getUser(token){
 }
 
 async function createUser({githubId, username}){
-
-  let query = `
+  let resData = await gqlQuery(`
   mutation {
     createUser(
       input: { user: { githubId: ${githubId}, username: "${username}" } }
@@ -75,9 +74,6 @@ async function createUser({githubId, username}){
         username
       }
     }
-  }`
-
-  let resData = await gqlQuery(query)
+  }`)
   return resData.data.createUser.user
-
 }

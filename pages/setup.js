@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { getCred } from '../utils'
 import { auth } from '../utils/auth'
-import { getInstallation, updateInstallationDAO } from '../utils/installation'
+import { getInstallationByGithubId, getInstallationUser, updateInstallationDAO, createInstallation, createInstallationUser } from '../utils/installation'
 import fetch from 'isomorphic-unfetch'
 import { createDAO, airdrop }  from '../utils/createDAO'
 import Loading from '../components/Loading'
@@ -15,22 +15,25 @@ const Setup = props => {
 
   useEffect(()=>{
     if(props.installation)
-      getCred({target: props.installation.target, githubToken: props.githubToken}).then(setCred)
+      getCred({installationId: props.installation.id, githubToken: props.githubToken}).then(setCred)
   }, [])
 
   useEffect(()=>{
     if(dao) setCreatingDAO()
   }, [dao])
 
+  let userId = props.user.id
+  let installationId = props.installation.id
+
   return (
     <div>
       <Header user={props.user} />
       <p>{props.installation ? props.installation.name : 'no installation'}</p>
-      {!dao && !creatingDAO && <button onClick={()=>{createDAO({userId: props.user.id, installationId: props.installation.id}, setDao); setCreatingDAO(true)}}>create dao</button>}
+      {!dao && !creatingDAO && <button onClick={()=>{createDAO({userId, installationId}, setDao); setCreatingDAO(true)}}>create dao</button>}
       {creatingDAO && <Loading>creating dao</Loading>}
       {dao && <p><DAOLink dao={dao}/></p>}
       {cred && <p>{JSON.stringify(cred)}</p>}
-      {dao && cred && <button onClick={()=>{airdrop({cred, userId: props.user.id, installationId: props.installation.id})}}>airdrop cred</button>}
+      {dao && cred && <button onClick={()=>{airdrop({cred, userId, installationId})}}>airdrop cred</button>}
     </div>
   )
 }
@@ -39,13 +42,25 @@ const Setup = props => {
 Setup.getInitialProps = async function(ctx) {
   const { query } = ctx
   const user = await auth(ctx)
-  const installationId = query["installation_id"]
+  const userId = user.id
+  const githubInstallationId = query["installation_id"]
   const setupAction = query["setup_action"]
   if(setupAction !== "install"){
     ctx.res.redirect('/')
     return {}
   }
-  const installation = await getInstallation({user, githubId: query["installation_id"]})
+  let installation = await getInstallationByGithubId({githubInstallationId})
+
+  if(!installation)
+    installation = await createInstallation({userId, githubInstallationId})
+
+  const installationId = installation.id
+  let installationUser = await getInstallationUser({userId, installationId})
+
+  if(!installationUser)
+    installationUser = await createInstallationUser({userId, installationId})
+  console.log("installationUser", installationUser)
+
   return { user, installation, githubToken: ctx.req.session.githubToken }
 }
 

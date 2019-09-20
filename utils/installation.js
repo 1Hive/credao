@@ -6,10 +6,25 @@ const SAMPLE_PRIVATE_KEY = "a8a54b2d8197bc0b19bb8a084031be71835580a01e70a45a13ba
 import { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } from './constants'
 import { gqlQuery } from './'
 
-export async function getInstallation({user, githubId}){
-  let query = `
+
+export async function getInstallation({installationId}){
+  const resData = await gqlQuery(`
   query {
-    installationByGithubId(githubId: ${githubId}) {
+    installationById(id: ${installationId}) {
+      id
+      name
+      target
+      dao
+    }
+  }
+  `)
+  return resData && resData.data.installationById
+}
+
+export async function getInstallationByGithubId({githubInstallationId}){
+  const resData = await gqlQuery(`
+  query {
+    installationByGithubId(githubId: ${githubInstallationId}) {
       id
       name
       target
@@ -17,22 +32,12 @@ export async function getInstallation({user, githubId}){
       creatorId
     }
   }
-  `
-  const resData = await gqlQuery(query)
-  console.log(resData)
-  if(resData.data.installationByGithubId)
-    return resData.data.installationByGithubId
-
-  const installation = await createInstallation({user, githubId})
-
-  const installationUser = await createInstallationUser({userId: installation.creatorId, installationId: installation.id})
-  console.log("installationUser", installationUser)
-
-  return installation
+  `)
+  return resData && resData.data.installationByGithubId
 }
 
-export async function getUserInstallation({userId, installationId}){
-  let query = `
+export async function getInstallationUser({userId, installationId}){
+  const resData = await gqlQuery(`
   query {
     installationUserByInstallationIdAndUserId(userId: ${userId}, installationId: ${installationId}) {
       address
@@ -43,15 +48,12 @@ export async function getUserInstallation({userId, installationId}){
       }
     }
   }
-  `
-
-  let resData = await gqlQuery(query)
-  console.log(resData)
+  `)
   return resData.data.installationUserByInstallationIdAndUserId
 }
 
 export async function getUserInstallationsByUserId(userId){
-  let query = `
+  const resData = await gqlQuery(`
   query {
     userById(id: ${userId}) {
       id
@@ -65,16 +67,14 @@ export async function getUserInstallationsByUserId(userId){
       }
     }
   }
-  `
-
-  let resData = await gqlQuery(query)
+  `)
   return resData.data.userById.installationsByInstallationUserUserIdAndInstallationId.nodes
 }
 
-async function createInstallationUser({userId, installationId}){
+export async function createInstallationUser({userId, installationId}){
   const wallet = ethers.Wallet.createRandom()
 
-  let query = `
+  const resData = await gqlQuery(`
   mutation {
     createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId}, autoKey: "${wallet.privateKey}" } } ) {
       installationUser {
@@ -84,9 +84,8 @@ async function createInstallationUser({userId, installationId}){
         autoKey
       }
     }
-  }`
+  }`)
 
-  let resData = await gqlQuery(query)
   await gasTopup(wallet.address)
   return resData.data.createInstallationUser.installationUser
 }
@@ -99,8 +98,8 @@ async function gasTopup(to){
   await tx.wait()
 }
 
-async function createInstallation({user, githubId}){
-  let data = await fetch(`https://api.github.com/app/installations/${githubId}/access_tokens`, {
+export async function createInstallation({userId, githubInstallationId}){
+  let data = await fetch(`https://api.github.com/app/installations/${githubInstallationId}/access_tokens`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${await githubJWT()}`,
@@ -124,13 +123,13 @@ async function createInstallation({user, githubId}){
     target = `@${repos[0].owner.login}`
   }
 
-  let query = `
+  let resData = await gqlQuery(`
   mutation {
     createInstallation(
       input: {
         installation: {
-          githubId: ${githubId}, githubToken: "${ghToken}", name: "${name}",
-          target: "${target}", creatorId: ${user.id}
+          githubId: ${githubInstallationId}, githubToken: "${ghToken}", name: "${name}",
+          target: "${target}", creatorId: ${userId}
         }
       }
     ) {
@@ -141,22 +140,18 @@ async function createInstallation({user, githubId}){
         creatorId
       }
     }
-  }`
-
-  let resData = await gqlQuery(query)
+  }`)
   return resData.data.createInstallation.installation
 }
 
 export async function updateInstallationDAO({id, dao}){
-  let query = `
+  let resData = await gqlQuery(`
   mutation {
     updateInstallationById(input: {installationPatch: {dao: "${dao}"}, id: ${id}}) {
       clientMutationId
     }
   }
-  `
-
-  let resData = await gqlQuery(query)
+  `)
   return resData.data.updateInstallationById.installation
 }
 

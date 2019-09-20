@@ -9,7 +9,7 @@
     "start": ". ./.env && NODE_ENV=production node server",
     "db:drop": "dropdb -U postgres -h localhost credao",
     "db:create": "createdb -U postgres -h localhost credao",
-    "db:setup": "psql -U postgres -h localhost -d credao -f db.sql",
+    "db:setup": "npm run db:create && psql -U postgres -h localhost -d credao -f db.sql",
     "db:reset": "npm run db:drop && npm run db:create && npm run db:setup"
   },
   "keywords": [],
@@ -40,7 +40,8 @@
     "react-dom": "^16.9.0",
     "react-markdown": "^4.2.2",
     "sourcecred": "^0.4.0",
-    "styled-components": "^5.0.0-beta.8"
+    "styled-components": "^5.0.0-beta.8",
+    "web3": "^1.2.1"
   },
   "devDependencies": {
     "cross-env": "^5.2.1"

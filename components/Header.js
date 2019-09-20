@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import React from 'react'
 
 const LogIn = props => {
   return (
@@ -10,9 +11,12 @@ const LogIn = props => {
 
 const LogOut = props => {
   return (
-    <Link href='/sign-out'>
-      <a>sign out</a>
-    </Link>
+    <React.Fragment>
+      <span style={{marginRight: "0.25em"}}>{props.username}</span>
+      <Link href='/sign-out'>
+        <a>sign out</a>
+      </Link>
+    </React.Fragment>
   )
 }
 
@@ -21,7 +25,14 @@ const linkStyle = {
 };
 
 const Header = props => {
-  return props.user ? <LogOut /> : <LogIn />
+  return (
+    <React.Fragment>
+      <Link href='/'>
+        <a>home</a>
+      </Link>
+      {props.user ? <LogOut {...props.user}/> : <LogIn />}
+    </React.Fragment>
+  )
 }
 
 export default Header;
