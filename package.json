@@ -10,7 +10,7 @@
     "db:drop": "dropdb -U postgres -h localhost credao",
     "db:create": "createdb -U postgres -h localhost credao",
     "db:setup": "npm run db:create && psql -U postgres -h localhost -d credao -f db.sql",
-    "db:reset": "npm run db:drop && npm run db:create && npm run db:setup"
+    "db:reset": "npm run db:drop && npm run db:setup"
   },
   "keywords": [],
   "author": "",

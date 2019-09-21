@@ -21,7 +21,7 @@ stuff not done:
 stuff being worked on:
 * airdropping cred diffs
 
-## Probably this will not work:
+#### Probably this will not work:
 
 1. clone and `yarn`
 1. `npm run db:setup` (need postgres installed)
@@ -32,7 +32,7 @@ export GITHUB_APP_ID=                                                   # github
 export GITHUB_CLIENT_ID=                                                # github client id assigned to app you created
 export GITHUB_CLIENT_SECRET=                                            # github app secret assigned to app you created
 export GITHUB_TOKEN=                                                    # a _user_ github access token for running sourcecred
-export SESSION_SECRET=                                                  # some secret phrase, put anything here
+export SESSION_SECRET=keyboard cat                                      # some secret phrase, put anything here
 export SOURCECRED_BIN=/some_path_to/sourcecred/bin/sourcecred           # path to sourcecred binary
 export SOURCECRED_OUTPUT=$PWD/data/cred
 export KEY_PATH=$PWD/some_private_key.pem                               # for json web token

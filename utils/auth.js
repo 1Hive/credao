@@ -1,6 +1,6 @@
 import { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } from './constants'
 import fetch from 'isomorphic-unfetch'
-import { gqlQuery } from './'
+import { gqlSubmit } from './query'
 
 export async function auth(ctx){
   const {err, req, res, query} = ctx
@@ -55,7 +55,7 @@ export async function getUser(token){
     }
   }
   `
-  let resData = await gqlQuery(query)
+  let resData = await gqlSubmit(query)
   console.log("getUser", resData)
   if(resData.data.userByGithubId)
     return resData.data.userByGithubId
@@ -64,7 +64,7 @@ export async function getUser(token){
 }
 
 async function createUser({githubId, username}){
-  let resData = await gqlQuery(`
+  let resData = await gqlSubmit(`
   mutation {
     createUser(
       input: { user: { githubId: ${githubId}, username: "${username}" } }

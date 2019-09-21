@@ -34,17 +34,17 @@ export async function createDAO({userId, installationId}, createCallback){
 }
 
 export async function airdrop({userId, installationId, cred}){
-  let { autoKey, installationByInstallationId: { dao } } = await getUserInstallation({userId, installationId})
+  let { autoKey, installationByInstallationId: { dao } } = await getInstallationUser({userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
 
-  let mappedToAddresses = await Promise.all(Object.keys(cred.points).map(async (name, i)=>{
-    let address = (ethers.Wallet.fromMnemonic(SAMPLE_MNEMONIC, `m/44'/60'/${i}'/0/0`)).address
-    let points = cred.points[name]
-    return {address, points}
-  }))
+  // let mappedToAddresses = await Promise.all(Object.keys(cred.points).map(async (name, i)=>{
+  //   let address = (ethers.Wallet.fromMnemonic(SAMPLE_MNEMONIC, `m/44'/60'/${i}'/0/0`)).address
+  //   let points = cred.points[name]
+  //   return {address, points}
+  // }))
 
-  let merklized = merklize("some_id", mappedToAddresses, cred.start, cred.end)
+  let merklized = merklize("some_id", cred.cred, cred.start, cred.end)
 
   let res = await ipfs.add(Buffer.from(JSON.stringify(merklized), 'utf8'))
   let hash = res[0].hash
