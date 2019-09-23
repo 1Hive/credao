@@ -1,21 +1,18 @@
 import { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } from './constants'
 import fetch from 'isomorphic-unfetch'
-import { gqlSubmit } from './query'
+import { getUserByGithubId, createUser } from './query'
 
 export async function auth(ctx){
   const {err, req, res, query} = ctx
-  console.log("SESSION", req.session)
+  // console.log("SESSION", req.session)
   if(!req.session.user) {
     if(query.code){
-      const ghToken = await createGithubToken(query.code)
-      if(!ghToken)
+      const githubToken = await createGithubToken(query.code)
+      if(!githubToken)
         return null   // TODO redirect /login
       else {
-        req.session.githubToken = ghToken
-        req.session.user = await getUser(ghToken)
+        req.session.user = await getUserWithToken(githubToken)
       }
-    } else if(req.session.githubToken){
-      req.session.user = await getUser(req.session.githubToken)
     } else {
       return null   // TODO redirect /login
     }
@@ -39,41 +36,18 @@ export async function createGithubToken(code){
   return (data).access_token
 }
 
-export async function getUser(token){
+export async function getUserWithToken(githubToken){
   // use token to get github user
-  const res = await fetch(GH_USER_URL, { headers: { 'Authorization': `token ${token}` }})
+  const res = await fetch(GH_USER_URL, { headers: { 'Authorization': `token ${githubToken}` }})
   const ghUser = await res.json()
   if(!ghUser)
     return null
 
-  // query db for existing user
-  let query = `
-  query {
-    userByGithubId(githubId: ${ghUser.id}) {
-      id
-      username
-    }
-  }
-  `
-  let resData = await gqlSubmit(query)
-  console.log("getUser", resData)
-  if(resData.data.userByGithubId)
-    return resData.data.userByGithubId
+  let githubId = ghUser.id
+  let username = ghUser.login
 
-  return await createUser({githubId: ghUser.id, username: ghUser.login})
-}
-
-async function createUser({githubId, username}){
-  let resData = await gqlSubmit(`
-  mutation {
-    createUser(
-      input: { user: { githubId: ${githubId}, username: "${username}" } }
-    ) {
-      user {
-        id
-        username
-      }
-    }
-  }`)
-  return resData.data.createUser.user
+  let user = await getUserByGithubId({githubId})
+  if(!user) user = await createUser({githubId, username})
+  user.githubToken = githubToken
+  return user
 }

@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react'
 import Header from '../components/Header'
 import DAOLink from '../components/DAOLink'
-import { getAirdropper } from '../utils/createDAO'
+import { getCred } from '../utils'
+import { getAirdropper, airdrop } from '../utils/dao'
 import { auth } from '../utils/auth'
-import { getUserInstallationsByUserId } from '../utils/installation'
+import { getUserInstallationsByUserId } from '../utils/query'
 import ipfsClient from 'ipfs-http-client'
 
 const Installation = (props) => {
+  const [cred, setCred] = useState()
   const [latest, setLatest] = useState()
+
   useEffect(()=>{
     (async ()=>{
       let airdropper = await getAirdropper({dao: props.dao})
@@ -20,11 +23,21 @@ const Installation = (props) => {
     })()
   }, [])
 
+  useEffect(()=>{
+    if(!latest) return
+    (async()=>{
+      let cred = await getCred({installationId: props.id, githubToken: props.user.githubToken, after: latest.data.end})
+      setCred(cred)
+    })()
+  }, [latest])
+
   return (
     <tr>
       <td>{props.name}</td>
       <td>{props.dao && <DAOLink dao={props.dao}/>}</td>
-      <td>{latest && latest.data && latest.data.end ? new Date(latest.data.end).toDateString() : 'unknown'}</td>
+      <td>{cred && cred.cred.length ? <button onClick={()=>{airdrop({cred, userId: user.id, installationId: props.id})}}>airdrop cred</button> : null}</td>
+      <td>{cred && JSON.stringify(cred)}</td>
+      <td>{latest && latest.data && latest.data.end}</td>
     </tr>
   )
 }
@@ -36,7 +49,7 @@ const Index = (props) =>
     {props.installations.length ?
       <React.Fragment>
         <p>Your organizations:</p>
-        <table><tbody>{props.installations.map(i=><Installation key={i.id} {...i}/>)}</tbody></table>
+        <table><tbody>{props.installations.map(i=><Installation user={props.user} key={i.id} {...i}/>)}</tbody></table>
       </React.Fragment>
       : null
     }
