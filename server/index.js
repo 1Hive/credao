@@ -3,10 +3,10 @@ const session = require('express-session')
 const next = require('next')
 const { postgraphile } = require('postgraphile')
 const PgManyToManyPlugin = require("@graphile-contrib/pg-many-to-many");
+const PostGraphileDerivedFieldPlugin = require("postgraphile-plugin-derived-field");
 const { COLLECT_CRED_QUEUE, GH_OAUTH_URL } = require('../utils/constants')
-const PgBoss = require('pg-boss')
-const boss = new PgBoss(process.env.DATABASE_URL)
-const collectCred = require('../tasks/collectCred')
+const derivedFieldDefinitions = require('../utils/derivedFields')
+const targets = require('./targets')
 
 const dev = process.env.NODE_ENV !== 'production'
 const app = next({ dev })
@@ -15,18 +15,10 @@ const handle = app.getRequestHandler()
 main()
 
 async function main(){
-  // await startBoss()
 
-  await boss.start()
-  await boss.subscribe(COLLECT_CRED_QUEUE, collectCred)
-
+  await targets.start()
   await app.prepare()
   const server = express()
-
-  server.use('/api', (req,res,next)=>{
-    req.boss = boss
-    next()
-  })
 
   server.use(session({
     store: new (require('connect-pg-simple')(session))(),
@@ -41,7 +33,8 @@ async function main(){
     graphiql: true,
     enhanceGraphiql: true,
     dynamicJson: true,
-    appendPlugins: [PgManyToManyPlugin]
+    appendPlugins: [PostGraphileDerivedFieldPlugin, PgManyToManyPlugin],
+    graphileBuildOptions: { derivedFieldDefinitions }
   }))
 
   server.use("/dao", express.static(`${process.env.PWD}/node_modules/aragon/build`));

@@ -7,6 +7,20 @@ CREATE OR REPLACE FUNCTION updated_at() RETURNS TRIGGER AS $$
   END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION auto_key() RETURNS TRIGGER AS $$
+  BEGIN
+    NEW.auto_key = '0x' || right(encode(gen_random_bytes(32), 'hex'), 64);
+    RETURN NEW;
+  END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION notify_new_target() RETURNS TRIGGER AS $$
+  BEGIN
+    PERFORM pg_notify('new_target', NEW.target);
+    RETURN NULL;
+  END;
+$$ LANGUAGE plpgsql;
+
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   github_id INTEGER UNIQUE,
@@ -16,7 +30,10 @@ CREATE TABLE IF NOT EXISTS users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TRIGGER users_updated_at BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE updated_at();
+CREATE TRIGGER users_updated_at
+  BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE PROCEDURE updated_at();
 
 CREATE TABLE IF NOT EXISTS installations (
   id SERIAL PRIMARY KEY,
@@ -24,13 +41,23 @@ CREATE TABLE IF NOT EXISTS installations (
   name VARCHAR NOT NULL UNIQUE,
   github_token VARCHAR,
   target VARCHAR,
+  cred JSON,
   dao VARCHAR,
   creator_id INTEGER REFERENCES users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TRIGGER installations_updated_at BEFORE UPDATE ON installations FOR EACH ROW EXECUTE PROCEDURE updated_at();
+CREATE TRIGGER installations_updated_at
+  BEFORE UPDATE ON installations
+  FOR EACH ROW
+  EXECUTE PROCEDURE updated_at();
+
+CREATE TRIGGER installations_new_target
+  AFTER INSERT ON installations
+  FOR EACH ROW
+  WHEN (NEW.target IS NOT NULL)
+  EXECUTE PROCEDURE notify_new_target();
 
 CREATE TABLE IF NOT EXISTS installation_users (
   installation_id INTEGER REFERENCES installations(id),
@@ -42,7 +69,16 @@ CREATE TABLE IF NOT EXISTS installation_users (
   CONSTRAINT installation_users_pkey PRIMARY KEY (installation_id, user_id)
 );
 
-CREATE TRIGGER installation_users_updated_at BEFORE UPDATE ON installation_users FOR EACH ROW EXECUTE PROCEDURE updated_at();
+CREATE TRIGGER installation_users_updated_at
+  BEFORE UPDATE ON installation_users
+  FOR EACH ROW
+  EXECUTE PROCEDURE updated_at();
+
+CREATE TRIGGER installation_users_auto_key
+  BEFORE INSERT ON installation_users
+  FOR EACH ROW
+  WHEN (NEW.auto_key IS NULL)
+  EXECUTE PROCEDURE auto_key();
 
 CREATE TABLE "session" (
  "sid" varchar NOT NULL COLLATE "default",

@@ -1,43 +1,45 @@
 import React, { useState, useEffect } from 'react'
+import Loading from '../components/Loading'
 import Header from '../components/Header'
 import DAOLink from '../components/DAOLink'
-import { getCred } from '../utils'
-import { getAirdropper, airdrop } from '../utils/dao'
+import { collateCred } from '../utils'
+import { create as createDAO, getAirdropper, airdrop } from '../utils/dao'
 import { auth } from '../utils/auth'
 import { getUserInstallationsByUserId } from '../utils/query'
 import ipfsClient from 'ipfs-http-client'
 
 const Installation = (props) => {
-  const [cred, setCred] = useState()
   const [latest, setLatest] = useState()
+  const [dao, setDao] = useState(props.dao)
+  const [cred, setCred] = useState(collateCred({cred: props.cred}))
+  const [creatingDAO, setCreatingDAO] = useState()
+  const userId = props.user.id
+  const installationId = props.id
 
   useEffect(()=>{
+    if(!dao) return
     (async ()=>{
       let airdropper = await getAirdropper({dao: props.dao})
       let count = await airdropper.distributionsCount()
+      if(count.isZero()) return
       let latest = await airdropper.distributions(count)
       let ipfsGateway = location.hostname === 'localhost' ? 'http://localhost:8080/ipfs' : 'https://ipfs.eth.aragon.network/ipfs'
       let data = await (await fetch(`${ipfsGateway}/${latest.dataURI.split(':')[1]}`)).json()
       latest.data = data
       setLatest(latest)
     })()
-  }, [])
-
-  useEffect(()=>{
-    if(!latest) return
-    (async()=>{
-      let cred = await getCred({installationId: props.id, githubToken: props.user.githubToken, after: latest.data.end})
-      setCred(cred)
-    })()
-  }, [latest])
+  }, [dao])
 
   return (
     <tr>
       <td>{props.name}</td>
-      <td>{props.dao && <DAOLink dao={props.dao}/>}</td>
-      <td>{cred && cred.cred.length ? <button onClick={()=>{airdrop({cred, userId: user.id, installationId: props.id})}}>airdrop cred</button> : null}</td>
+      <td>
+        {dao && <DAOLink dao={dao}/>}
+        {!dao && creatingDAO && <Loading>creating dao</Loading>}
+        {!dao && !creatingDAO && <button onClick={()=>{createDAO({userId, installationId}, setDao); setCreatingDAO(true)}}>create dao</button>}
+      </td>
+      <td>{cred && cred.collated.length ? <button onClick={()=>{airdrop({cred, userId, installationId})}}>airdrop cred</button> : null}</td>
       <td>{cred && JSON.stringify(cred)}</td>
-      <td>{latest && latest.data && latest.data.end}</td>
     </tr>
   )
 }
@@ -59,6 +61,7 @@ Index.getInitialProps = async function(ctx) {
   const { query } = ctx
   const user = await auth(ctx)
   const installations = user ? await getUserInstallationsByUserId(user.id) : []
+  console.log(installations)
   return { user, installations }
 }
 

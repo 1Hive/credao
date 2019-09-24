@@ -1,5 +1,6 @@
 secure/lock data access
 optional email on cred collection
+cron cred collection
 upgrade to counterfactual wallets and embed in aragon client
 interface to upgrade from autogen'd key
 cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff

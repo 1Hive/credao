@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { getCred } from '../utils'
+// import { getCred } from '../utils'
 import { auth } from '../utils/auth'
 import {
   getInstallationGithubToken,
@@ -10,20 +10,16 @@ import {
   createInstallationUser
 } from '../utils/query'
 import fetch from 'isomorphic-unfetch'
+import { collateCred } from '../utils'
 import { create as createDAO, airdrop }  from '../utils/dao'
 import Loading from '../components/Loading'
 import Header from '../components/Header'
 import DAOLink from '../components/DAOLink'
 
 const Setup = props => {
-  const [cred, setCred] = useState()
+  const [cred, setCred] = useState(props.installation && props.installation.cred ? collateCred({cred: props.installation.cred}) : null)
   const [dao, setDao] = useState(props.installation && props.installation.dao)
   const [creatingDAO, setCreatingDAO] = useState()
-
-  useEffect(()=>{
-    if(props.installation)
-      getCred({installationId: props.installation.id, githubToken: props.githubToken}).then(setCred)
-  }, [])
 
   useEffect(()=>{
     if(dao) setCreatingDAO()
@@ -70,7 +66,7 @@ Setup.getInitialProps = async function(ctx) {
     installationUser = await createInstallationUser({userId, installationId})
   console.log("installationUser", installationUser)
 
-  return { user, installation, githubToken: ctx.req.session.githubToken }
+  return { user, installation }
 }
 
 export default Setup

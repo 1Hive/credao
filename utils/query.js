@@ -47,36 +47,33 @@ export async function updateInstallationDAO({id, dao}){
 export async function getInstallationByGithubId({githubInstallationId}){
   const resData = await gqlSubmit(`query {
     installationByGithubId(githubId: ${githubInstallationId}) {
-      id name target dao creatorId } }`)
+      id name target dao cred creatorId } }`)
   return resData && resData.data.installationByGithubId
 }
 
 export async function getUserInstallationsByUserId(userId){
   const resData = await gqlSubmit(`query { userById(id: ${userId}) { id
       installationsByInstallationUserUserIdAndInstallationId {
-        nodes { id name target dao } } } }`)
+        nodes { id name target dao cred creatorId } } } }`)
   return resData && resData.data.userById.installationsByInstallationUserUserIdAndInstallationId.nodes
 }
 
 export async function createInstallationUser({userId, installationId}){
-  const wallet = ethers.Wallet.createRandom()
-
   const resData = await gqlSubmit(`mutation {
-    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId}, autoKey: "${wallet.privateKey}" } } ) {
-      installationUser { userId installationId address autoKey } } }`)
-
+    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId} } } ) {
+      installationUser { userId installationId address autoAddress autoKey } } }`)
   return resData && resData.data.createInstallationUser.installationUser
 }
 
 export async function getInstallationById({installationId}){
-  const resData = await gqlSubmit(`query { installationById(id: ${installationId}) { id name target dao } }`)
+  const resData = await gqlSubmit(`query { installationById(id: ${installationId}) { id name target dao cred creatorId } }`)
   return resData && resData.data.installationById
 }
 
 export async function getInstallationUser({userId, installationId}){
   const resData = await gqlSubmit(`query {
     installationUserByInstallationIdAndUserId(userId: ${userId}, installationId: ${installationId}) {
-      userId installationId address autoKey
+      userId installationId address autoAddress autoKey
       installationByInstallationId { name dao }
     } }`)
   return resData && resData.data.installationUserByInstallationIdAndUserId
@@ -99,6 +96,16 @@ export async function getUserByUsername({username}){
   let resData = await gqlSubmit(`query { userByUsername(username: "${username}") { id } }`)
   console.log(resData)
   return resData && resData.data.userByUsername
+}
+
+export async function getInstallationUserAddress({username, installationId}){
+  let user = await getUserByUsername({username})
+  if(!user) user = await createUser({username})
+
+  let installationUser = await getInstallationUser({userId: user.id, installationId})
+  if(!installationUser) installationUser = await createInstallationUser({userId: user.id, installationId})
+
+  return installationUser.address || installationUser.autoAddress
 }
 
 export async function gqlSubmit(query){

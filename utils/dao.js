@@ -2,7 +2,7 @@ import { abi as TemplateABI } from "../../1hive/airdrop/build/contracts/Template
 import { abi as AirdropABI } from "../../1hive/airdrop/build/contracts/Airdrop.json"
 import { abi as KernelABI } from "@aragon/os/build/contracts/Kernel.json"
 import { ethers } from "ethers"
-import { getInstallationUser, updateInstallationDAO } from "./query"
+import { getInstallationUser, getInstallationUserAddress, updateInstallationDAO } from "./query"
 import { gasTopup } from './'
 const templateAddress = "0xD13a7D8A728692eB2c56135B5EB5A1951b3F8395"
 const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
@@ -14,7 +14,6 @@ let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
 
 export async function create({userId, installationId}, createCallback){
   let { autoKey, installationByInstallationId: { name } } = await getInstallationUser({userId, installationId})
-
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
 
   if((await wallet.getBalance()).isZero())
@@ -39,7 +38,12 @@ export async function airdrop({userId, installationId, cred}){
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
 
-  let merklized = merklize("some_id", cred.cred, cred.start, cred.end)
+  cred.collated = Promise.all(
+    cred.collated.map(
+      async c=>( { ...c, address: await getInstallationUserAddress({username: c.username, installationId}) } )
+    ))
+
+  let merklized = merklize("some_id", cred.collated, cred.start, cred.end)
 
   let res = await ipfs.add(Buffer.from(JSON.stringify(merklized), 'utf8'))
   let hash = res[0].hash
