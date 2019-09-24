@@ -7,7 +7,7 @@ export function collateCred({cred, after}){
   if(after){
     // after = 1566691200000
     startIdx = cred[1].intervalsJSON.findIndex(interval=>interval.startTimeMs >= after)
-    if(startIdx === -1) return {cred: []}
+    if(startIdx === -1) return null
   }
 
   console.log("startIdx", startIdx)

@@ -88,13 +88,11 @@ export async function createUser({githubId, username}){
 
 export async function getUserByGithubId({githubId}){
   let resData = await gqlSubmit(`query { userByGithubId(githubId: ${githubId}) { id username } }`)
-  console.log(resData)
   return resData && resData.data.userByGithubId
 }
 
 export async function getUserByUsername({username}){
   let resData = await gqlSubmit(`query { userByUsername(username: "${username}") { id } }`)
-  console.log(resData)
   return resData && resData.data.userByUsername
 }
 

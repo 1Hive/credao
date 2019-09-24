@@ -31,9 +31,7 @@ export async function createGithubToken(code){
       client_secret: process.env.GITHUB_CLIENT_SECRET
     })
   })
-  let data = await res.json()
-  console.log(data)
-  return (data).access_token
+  return (await res.json()).access_token
 }
 
 export async function getUserWithToken(githubToken){

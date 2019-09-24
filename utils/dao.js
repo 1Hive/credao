@@ -38,17 +38,14 @@ export async function airdrop({userId, installationId, cred}){
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
 
-  cred.collated = Promise.all(
-    cred.collated.map(
-      async c=>( { ...c, address: await getInstallationUserAddress({username: c.username, installationId}) } )
-    ))
+  cred.collated = await Promise.all(cred.collated.map(
+    async c=>( { ...c, address: await getInstallationUserAddress({username: c.username, installationId}) } )
+  ))
 
   let merklized = merklize("some_id", cred.collated, cred.start, cred.end)
 
   let res = await ipfs.add(Buffer.from(JSON.stringify(merklized), 'utf8'))
   let hash = res[0].hash
-
-  console.log(merklized, hash, airdropper)
 
   let tx = await airdropper.start(merklized.root, `ipfs:${hash}`, {gasLimit: 1000000})
   await tx.wait()
