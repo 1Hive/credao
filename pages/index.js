@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Loading from '../components/Loading'
 import Header from '../components/Header'
 import DAOLink from '../components/DAOLink'
+import UserContext from '../components/UserContext';
 import { collateCred } from '../utils'
 import { create as createDAO, getAirdropper, airdrop } from '../utils/dao'
 import { auth } from '../utils/auth'
@@ -61,28 +62,34 @@ const Installation = (props) => {
 }
 // <td></td>
 
-const Index = (props) =>
-  <div>
-    <Header user={props.user} />
-    <p>{props.user ? `Welcome, ${props.user.username}` : `please login`}</p>
-    {props.installations.length ?
-      <React.Fragment>
-        <p>Your organizations:</p>
-        <table>
-          <tbody>
-            {props.installations.map(i=><Installation user={props.user} key={i.id} {...i}/>)}
-          </tbody>
-        </table>
-      </React.Fragment>
-      : null
-    }
-  </div>
+const Index = (props) => {
+  const { user } = useContext(UserContext)
+  const [installations, setInstallations] = useState()
 
-Index.getInitialProps = async function(ctx) {
-  const { query } = ctx
-  const user = await auth(ctx)
-  const installations = user ? await getUserInstallationsByUserId(user.id) : []
-  return { user, installations }
+  useEffect(()=>{
+    if(!user) return
+    (async ()=>{
+      setInstallations( await getUserInstallationsByUserId(user.id) )
+    })()
+  }, [user])
+
+  return (
+    <div>
+      <Header />
+      <p>{user ? `Welcome, ${user.username}` : `please login`}</p>
+      {installations && installations.length ?
+        <React.Fragment>
+          <p>Your organizations:</p>
+          <table>
+            <tbody>
+              {installations.map(i=><Installation user={user} key={i.id} {...i}/>)}
+            </tbody>
+          </table>
+        </React.Fragment>
+        : null
+      }
+    </div>
+  )
 }
 
 export default Index

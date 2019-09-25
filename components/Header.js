@@ -1,5 +1,6 @@
+import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
-import React from 'react'
+import UserContext from './UserContext';
 
 const LogIn = props => {
   return (
@@ -25,12 +26,16 @@ const linkStyle = {
 };
 
 const Header = props => {
+  const { user } = useContext(UserContext)
   return (
     <React.Fragment>
       <Link href='/'>
         <a style={{marginRight: "0.25em"}}>home</a>
       </Link>
-      {props.user ? <LogOut {...props.user}/> : <LogIn />}
+      <Link href='/test'>
+        <a style={{marginRight: "0.25em"}}>test</a>
+      </Link>
+      {user ? <LogOut {...user}/> : <LogIn />}
     </React.Fragment>
   )
 }

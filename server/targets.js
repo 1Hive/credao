@@ -52,6 +52,5 @@ node ${process.env.SOURCECRED_BIN} load ${target}`
   const cred = await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`)
 
   let res = await client.query(`UPDATE installations SET cred = ($1) WHERE target = ($2)`, [cred, target])
-  console.log(res)
 
 }
