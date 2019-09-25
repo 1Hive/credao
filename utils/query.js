@@ -9,10 +9,11 @@ module.exports = {
   getInstallationRepos,
   createInstallation,
   updateInstallationDAO,
-  getInstallationByGithubId,
   getUserInstallationsByUserId,
   createInstallationUser,
+  getInstallationByGithubId,
   getInstallationById,
+  getInstallationByName,
   getInstallationUser,
   createUser,
   getUserByGithubId,
@@ -61,13 +62,6 @@ async function updateInstallationDAO({id, dao}){
   return resData && resData.data.updateInstallationById.installation
 }
 
-async function getInstallationByGithubId({githubInstallationId}){
-  const resData = await gqlSubmit(`query {
-    installationByGithubId(githubId: ${githubInstallationId}) {
-      id name target dao cred creatorId } }`)
-  return resData && resData.data.installationByGithubId
-}
-
 async function getUserInstallationsByUserId(userId){
   const resData = await gqlSubmit(`query { userById(id: ${userId}) { id
       installationsByInstallationUserUserIdAndInstallationId {
@@ -82,9 +76,21 @@ async function createInstallationUser({userId, installationId}){
   return resData && resData.data.createInstallationUser.installationUser
 }
 
+async function getInstallationByGithubId({githubInstallationId}){
+  const resData = await gqlSubmit(`query {
+    installationByGithubId(githubId: ${githubInstallationId}) {
+      id name target dao cred creatorId } }`)
+  return resData && resData.data.installationByGithubId
+}
+
 async function getInstallationById({installationId}){
   const resData = await gqlSubmit(`query { installationById(id: ${installationId}) { id name target dao cred creatorId } }`)
   return resData && resData.data.installationById
+}
+
+async function getInstallationByName({name}){
+  const resData = await gqlSubmit(`query { installationByName(name: "${name}") { id name target dao cred creatorId } }`)
+  return resData && resData.data.installationByName
 }
 
 async function getInstallationUser({userId, installationId}){

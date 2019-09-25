@@ -36,7 +36,12 @@ export async function timeout(ms){
 export async function gasTopup(to){
   let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
   let wallet = (new ethers.Wallet(SAMPLE_PRIVATE_KEY)).connect(provider)
-  let value = ethers.utils.parseEther('0.1');
-  let tx = await wallet.sendTransaction({ to, value });
+  let value = ethers.utils.parseEther('0.1')
+  let tx = await wallet.sendTransaction({ to, value })
   await tx.wait()
+}
+
+export async function ipfsFetch(hash){
+  let ipfsGateway = location.hostname === 'localhost' ? 'http://localhost:8080/ipfs' : 'https://ipfs.eth.aragon.network/ipfs'
+  return await fetch(`${ipfsGateway}/${hash}`)
 }

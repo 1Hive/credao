@@ -51,27 +51,21 @@ async function main(){
 
   server.use("/dao", express.static(`${process.env.PWD}/node_modules/aragon/build`));
 
-  server.get('/installation', async (req, res)=>{
-    const userId = req.query.user_id
-    const githubInstallationId = req.query.github_installation_id
+  server.get('/setup', user, async (req, res)=>{
+    // http://localhost:3000/setup?code=A_USER_CODE&installation_id=1884491&setup_action=install
+    if(!req.session.user) return res.reply("no user")
+    if(!req.query.installation_id) return res.redirect('/')
 
-    return res.json( await getInstallation({userId, githubInstallationId}) )
+    const installation = await getInstallation({
+      userId: req.session.user.id,
+      githubInstallationId: req.query.installation_id
+    })
+
+    res.redirect(`/org/${installation.name}`)
   })
 
-  server.get('/auth', async (req, res)=>{
-    console.log(req.query)
-    if(!req.session.user){
-      if(req.query.code) {
-        const githubToken = await createGithubToken(req.query.code)
-        if(githubToken) {
-          req.session.user = await getUserWithToken(githubToken)
-        } else {
-          return res.json(null)
-        }
-      } else return res.json(null)
-    }
-
-    return res.json(req.session.user)
+  server.get('/auth', user, async (req, res)=>{
+    res.json(req.session.user)
   })
 
   server.get('/sign-in', (req, res)=>{
@@ -92,6 +86,16 @@ async function main(){
     process.env.BASE_URL = baseURL
   })
 
+}
+
+async function user(req, res, next){
+  if(!req.session.user && req.query.code){
+    const githubToken = await createGithubToken(req.query.code)
+    if(githubToken) {
+      req.session.user = await getUserWithToken(githubToken)
+    }
+  }
+  next()
 }
 
 async function getInstallation({userId, githubInstallationId}){

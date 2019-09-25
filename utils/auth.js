@@ -2,24 +2,7 @@ const { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } = require(
 const fetch = require('isomorphic-unfetch')
 const { getUserByGithubId, createUser } = require('./query')
 
-// export async function auth(ctx){
-//   const {err, req, res, query} = ctx
-//   // console.log("SESSION", req.session)
-//   if(!req.session.user) {
-//     if(query.code){
-//       const githubToken = await createGithubToken(query.code)
-//       if(!githubToken)
-//         return null   // TODO redirect /login
-//       else {
-//         req.session.user = await getUserWithToken(githubToken)
-//       }
-//     } else {
-//       return null   // TODO redirect /login
-//     }
-//   }
-//
-//   return req.session.user
-// }
+
 module.exports = {
   createGithubToken,
   getUserWithToken

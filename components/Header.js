@@ -32,9 +32,6 @@ const Header = props => {
       <Link href='/'>
         <a style={{marginRight: "0.25em"}}>home</a>
       </Link>
-      <Link href='/test'>
-        <a style={{marginRight: "0.25em"}}>test</a>
-      </Link>
       {user ? <LogOut {...user}/> : <LogIn />}
     </React.Fragment>
   )
