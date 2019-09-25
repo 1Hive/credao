@@ -1,13 +1,16 @@
-secure/lock data access
-optional email on cred collection
-cron cred collection
-upgrade to counterfactual wallets and embed in aragon client
-interface to upgrade from autogen'd key
-cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
-serve modified aragon wrapper that uses autogen'd key and counterfactual wallet
-use appropriate github token for cred collection
-handle case when not all repos included in installation (talk to sourcecred devs about combining multiple repos)
-ui/ux
-documentation
-import merklize from airdrop module
-handle org name conflict
+- [ ] secure data access
+- [ ] handle org name conflict
+- [ ] allow change org name
+- [x] cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
+- [ ] cron cred collection
+- [x] host aragon client at /dao
+- [ ] embed wallet functionality in hosted aragon client
+- [ ] upgrade to counterfactual wallets
+- [ ] interface to upgrade from autogen'd key
+- [ ] option to email on cred update
+- [ ] use appropriate github token for cred collection
+- [ ] handle case when not all repos included in installation
+- [ ] import `merklize` from published airdrop module
+- [ ] dev documentation
+- [ ] user documentation
+- [ ] ui/design consideration
