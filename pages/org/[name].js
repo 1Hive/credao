@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import { useRouter } from 'next/router';
 import Loading from '../../components/Loading'
-import Header from '../../components/Header'
+import Layout from '../../components/Layout'
 import DAOLink from '../../components/DAOLink'
 import UserContext from '../../components/UserContext';
 import { collateCred, ipfsFetch } from '../../utils'
@@ -82,10 +82,9 @@ export default function Installation() {
   }, [router])
 
   return (
-    <div>
-      <Header />
+    <Layout>
       {installation && <InstallationDetail {...installation} />}
       {error && <h3>{error}</h3>}
-    </div>
+    </Layout>
   );
 }

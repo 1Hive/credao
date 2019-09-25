@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import Loading from '../components/Loading'
-import Header from '../components/Header'
+import Layout from '../components/Layout'
 import DAOLink from '../components/DAOLink'
 import UserContext from '../components/UserContext';
 import { collateCred } from '../utils'
@@ -22,8 +22,7 @@ const Index = (props) => {
   }, [user])
 
   return (
-    <div>
-      <Header />
+    <Layout>
       <p>{user ? `Welcome, ${user.username}` : `please login`}</p>
       {installations && installations.length ?
         <React.Fragment>
@@ -41,7 +40,7 @@ const Index = (props) => {
         </React.Fragment>
         : null
       }
-    </div>
+    </Layout>
   )
 }
 

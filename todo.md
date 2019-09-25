@@ -10,3 +10,4 @@ handle case when not all repos included in installation (talk to sourcecred devs
 ui/ux
 documentation
 import merklize from airdrop module
+handle org name conflict
