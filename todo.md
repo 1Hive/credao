@@ -1,6 +1,7 @@
 - [ ] secure data access
 - [ ] handle org name conflict
-- [ ] allow change org name
+- [ ] allow org name change
+- [ ] map org admins from github
 - [x] cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
 - [ ] cron cred collection
 - [x] host aragon client at /dao

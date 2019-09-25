@@ -1,30 +1,17 @@
-const { Client } = require('pg')
-const client = new Client(process.env.DATABASE_URL)
+const PGPubsub = require('pg-pubsub')
+const pubsub = new PGPubsub(process.env.DATABASE_URL)
 const { readFile, mkdirp } = require('fs-extra')
 const base64url = require("base64url")
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
+const { getInstallationsByTarget, updateInstallationCred } = require('../utils/query')
 
 module.exports = {
   start
 }
 
 async function start(){
-
-  await client.connect()
-  await client.query('LISTEN new_target')
-
-  client.on('error', err => {
-    console.error('something bad has happened!', err.stack)
-  })
-
-  client.on('notification', function({channel, payload}) {
-    switch(channel){
-      case 'new_target':
-        collectCred(payload)
-    }
-  })
-
+  pubsub.addChannel('new_target', collectCred)
 }
 
 async function collectCred(target){
@@ -49,8 +36,11 @@ node ${process.env.SOURCECRED_BIN} load ${target}`
 
   console.log('\n\stdout:\n', stdout)
 
-  const cred = await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`)
+  const cred = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`))
 
-  let res = await client.query(`UPDATE installations SET cred = ($1) WHERE target = ($2)`, [cred, target])
+  let installations = await getInstallationsByTarget({target})
+  console.log(installations)
+  let res = await Promise.all(installations.map(async ({id})=>await updateInstallationCred({id, cred})))
+  // let res = await client.query(`UPDATE installations SET cred = ($1) WHERE target = ($2)`, [cred, target])
 
 }

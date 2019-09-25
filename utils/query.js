@@ -14,6 +14,8 @@ module.exports = {
   getInstallationByGithubId,
   getInstallationById,
   getInstallationByName,
+  getInstallationsByTarget,
+  updateInstallationCred,
   getInstallationUser,
   createUser,
   getUserByGithubId,
@@ -62,6 +64,14 @@ async function updateInstallationDAO({id, dao}){
   return resData && resData.data.updateInstallationById.installation
 }
 
+async function updateInstallationCred({id, cred}){
+  let resData = await gqlSubmit(`
+    mutation UpdateCred($cred: JSON!) { updateInstallationById(input: { installationPatch: { cred: $cred }, id: ${id} }) {
+        clientMutationId } }`, {cred})
+  console.log(resData)
+  return resData && resData.data.updateInstallationById.installation
+}
+
 async function getUserInstallationsByUserId(userId){
   const resData = await gqlSubmit(`query { userById(id: ${userId}) { id
       installationsByInstallationUserUserIdAndInstallationId {
@@ -91,6 +101,11 @@ async function getInstallationById({installationId}){
 async function getInstallationByName({name}){
   const resData = await gqlSubmit(`query { installationByName(name: "${name}") { id name target dao cred creatorId } }`)
   return resData && resData.data.installationByName
+}
+
+async function getInstallationsByTarget({target}){
+  const resData = await gqlSubmit(`query MyQuery { allInstallations(condition: {target: "${target}"}) { nodes { id } } }`)
+  return resData && resData.data.allInstallations.nodes
 }
 
 async function getInstallationUser({userId, installationId}){
@@ -129,15 +144,17 @@ async function getInstallationUserAddress({username, installationId}){
   return installationUser.address || installationUser.autoAddress
 }
 
-async function gqlSubmit(query){
+async function gqlSubmit(query, variables){
   let baseURL = ''
   if(typeof window === "undefined")
     baseURL = process.env.BASE_URL
 
+  let body = {query, variables}
+  console.log(body)
   let res = await fetch(`${baseURL}/graphql`, {
     method: "POST",
     headers: {"Content-Type": "application/json", "Accept": "application/json"},
-    body: JSON.stringify({query})
+    body: JSON.stringify(body)
   })
   return (await res.json())
 }

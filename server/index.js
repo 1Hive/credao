@@ -3,8 +3,8 @@ const session = require('express-session')
 const next = require('next')
 const { postgraphile } = require('postgraphile')
 const fetch = require('isomorphic-unfetch')
-const PgManyToManyPlugin = require("@graphile-contrib/pg-many-to-many");
-const PostGraphileDerivedFieldPlugin = require("postgraphile-plugin-derived-field");
+const PgManyToManyPlugin = require("@graphile-contrib/pg-many-to-many")
+const PostGraphileDerivedFieldPlugin = require("postgraphile-plugin-derived-field")
 const { COLLECT_CRED_QUEUE, GH_OAUTH_URL } = require('../utils/constants')
 const derivedFieldDefinitions = require('../utils/derivedFields')
 const {
@@ -46,7 +46,8 @@ async function main(){
     enhanceGraphiql: true,
     dynamicJson: true,
     appendPlugins: [PostGraphileDerivedFieldPlugin, PgManyToManyPlugin],
-    graphileBuildOptions: { derivedFieldDefinitions }
+    graphileBuildOptions: { derivedFieldDefinitions },
+    bodySizeLimit: '1MB'
   }))
 
   server.use("/dao", express.static(`${process.env.PWD}/node_modules/aragon/build`));

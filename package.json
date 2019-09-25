@@ -38,6 +38,7 @@
     "next": "^9.0.5",
     "parse-link-header": "^1.0.1",
     "pg-boss": "^3.1.7",
+    "pg-pubsub": "^0.5.0",
     "postgraphile": "^4.4.3",
     "postgraphile-plugin-derived-field": "^1.0.0-alpha.7",
     "react": "^16.9.0",
