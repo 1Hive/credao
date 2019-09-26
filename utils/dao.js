@@ -12,8 +12,8 @@ import ipfsClient from 'ipfs-http-client'
 let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
 let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
 
-export async function create({userId, installationId}, createCallback){
-  let { autoKey, installationByInstallationId: { name } } = await getInstallationUser({userId, installationId})
+export async function create({jwt, userId, installationId}, createCallback){
+  let { autoKey, installationByInstallationId: { name } } = await getInstallationUser({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
 
   if((await wallet.getBalance()).isZero())
@@ -24,7 +24,7 @@ export async function create({userId, installationId}, createCallback){
   template.on("DeployDao", async (dao, e)=>{
     if(e.transactionHash === tx.hash){
       template.removeListener("DeployDao")
-      await updateInstallationDAO({id: installationId, dao})
+      await updateInstallationDAO({jwt, id: installationId, dao})
       createCallback(dao)
     }
   })
@@ -33,22 +33,23 @@ export async function create({userId, installationId}, createCallback){
   return await tx.wait()
 }
 
-export async function airdrop({userId, installationId, cred}){
-  let { autoKey, installationByInstallationId: { dao } } = await getInstallationUser({userId, installationId})
+export async function airdrop({jwt, userId, installationId, diff}, droppedCallback){
+  let { autoKey, installationByInstallationId: { dao } } = await getInstallationUser({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
 
-  cred.collated = await Promise.all(cred.collated.map(
-    async c=>( { ...c, address: await getInstallationUserAddress({username: c.username, installationId}) } )
+  diff.cred = await Promise.all(diff.cred.map(
+    async c=>( { ...c, address: await getInstallationUserAddress({jwt, username: c.username, installationId}) } )
   ))
 
-  let merklized = merklize("some_id", cred.collated, cred.start, cred.end)
+  let merklized = merklize("some_id", diff.cred, diff.start, diff.end)
 
   let res = await ipfs.add(Buffer.from(JSON.stringify(merklized), 'utf8'))
   let hash = res[0].hash
 
   let tx = await airdropper.start(merklized.root, `ipfs:${hash}`, {gasLimit: 1000000})
   await tx.wait()
+  droppedCallback(true)
 }
 
 export async function getAirdropper({dao, wallet}){

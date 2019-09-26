@@ -5,6 +5,7 @@ const base64url = require("base64url")
 const { promisify } = require('util')
 const exec = promisify(require('child_process').exec)
 const { getInstallationsByTarget, updateInstallationCred } = require('../utils/query')
+const { adminJWT } = require("./jwt")
 
 module.exports = {
   start
@@ -38,9 +39,7 @@ node ${process.env.SOURCECRED_BIN} load ${target}`
 
   const cred = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`))
 
-  let installations = await getInstallationsByTarget({target})
-  console.log(installations)
-  let res = await Promise.all(installations.map(async ({id})=>await updateInstallationCred({id, cred})))
-  // let res = await client.query(`UPDATE installations SET cred = ($1) WHERE target = ($2)`, [cred, target])
+  let installations = await getInstallationsByTarget({jwt: adminJWT, target})
+  let res = await Promise.all(installations.map(async ({id})=>await updateInstallationCred({jwt: adminJWT, id, cred})))
 
 }

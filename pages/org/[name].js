@@ -19,6 +19,7 @@ function InstallationDetail(props){
   const [diff, setDiff] = useState()
   const [showCred, setShowCred] = useState()
   const [email, setEmail] = useState()
+  const [dropped, setDropped] = useState()
 
   useEffect(()=>{
     if(!dao) return
@@ -36,19 +37,19 @@ function InstallationDetail(props){
       latest.data = await (await ipfsFetch(latest.dataURI.split(':')[1])).json()
       setLatest(latest)
     })()
-  }, [airdropper])
+  }, [airdropper, dropped])
 
   useEffect(()=>{
     if(!count || !cred) return
-    if(count.isZero()) return setDiff(collateCred({cred: props.cred}))
-    else if(latest) return setDiff(collateCred({cred: props.cred, after: latest.data.end}))
+    if(count.isZero()) return setDiff(collateCred({raw: props.cred}))
+    else if(latest) return setDiff(collateCred({raw: props.cred, after: latest.data.end}))
   }, [cred, count, latest])
 
   return (
     <React.Fragment>
       <h1>{props.name}</h1>
       {dao && <p><DAOLink dao={dao}>visit dao</DAOLink></p>}
-      {!dao && !creating && <button onClick={()=>{createDAO({userId: user.id, installationId: props.id}, setDao); setCreating(true)}}>create dao</button>}
+      {!dao && !creating && <button onClick={()=>{createDAO({jwt: user.jwt, userId: user.id, installationId: props.id}, setDao); setCreating(true)}}>create dao</button>}
       {creating && <Loading>creating dao</Loading>}
       {dao && count === undefined && <Loading>retreiving org details</Loading>}
       {count !== undefined && <p>{`there ${count.toNumber() === 1 ? 'has' : 'have'} been ${count} cred-drop${count.toNumber() === 1 ? '' : 's'}`}</p>}
@@ -58,7 +59,7 @@ function InstallationDetail(props){
       {diff &&
         <div>
           <p>{`cred is available covering ${new Date(diff.start).toDateString()} to ${new Date(diff.end).toDateString()}`}</p>
-          <p><button onClick={()=>airdrop({diff, userId: user.id, installationId: props.id})}>airdrop cred</button></p>
+          <p>{!dropped ? <button onClick={()=>airdrop({jwt: user.jwt, diff, userId: user.id, installationId: props.id}, setDropped)}>airdrop cred</button> : <Loading>airdropping cred</Loading>}</p>
           <div>
             <button onClick={()=>setShowCred(!showCred)}>{showCred ? 'hide cred' : 'show cred'}</button>
             {showCred && <p>{JSON.stringify(diff)}</p>}
@@ -73,13 +74,14 @@ export default function Installation() {
   const { user } = useContext(UserContext)
   const [installation, setInstallation] = useState()
   const [error, setError] = useState()
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(()=>{
     if(!router.query.name) return
-    console.log(router.query.name)
-    getInstallationByName({name: router.query.name}).then(i=>i ? setInstallation(i) : setError(`${router.query.name} org not found`))
-  }, [router])
+    if(!user) return
+    getInstallationByName({jwt: user.jwt, name: router.query.name})
+      .then(i=>i ? setInstallation(i) : setError(`${router.query.name} org not found`))
+  }, [user, router])
 
   return (
     <Layout>

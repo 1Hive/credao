@@ -2,28 +2,28 @@ import fetch from 'isomorphic-unfetch'
 import { ethers } from "ethers"
 const SAMPLE_PRIVATE_KEY = "a8a54b2d8197bc0b19bb8a084031be71835580a01e70a45a13babd16c9bc1563"
 
-export function collateCred({cred, after}){
+export function collateCred({raw, after}){
   let startIdx = 0
   if(after){
     // after = 1566691200000
-    startIdx = cred[1].intervalsJSON.findIndex(interval=>interval.startTimeMs >= after)
+    startIdx = raw[1].intervalsJSON.findIndex(interval=>interval.startTimeMs >= after)
     if(startIdx === -1) return null
   }
 
   console.log("startIdx", startIdx)
 
-  const collated = []
-  for (let user in cred[1].credJSON){
+  const cred = []
+  for (let user in raw[1].credJSON){
     let nameArr = user.split('\0')
     if(!nameArr.includes('USER')) continue
     let username = nameArr[nameArr.length-2]
-    collated.push({username, points: cred[1].credJSON[user].slice(startIdx).reduce((a, b) => a + b, 0)})
+    cred.push({username, points: raw[1].credJSON[user].slice(startIdx).reduce((a, b) => a + b, 0)})
   }
 
-  let intervals = cred[1].intervalsJSON
+  let intervals = raw[1].intervalsJSON
 
   return {
-    collated,
+    cred,
     start: intervals[startIdx].startTimeMs,
     end: intervals[intervals.length - 1].endTimeMs
   }

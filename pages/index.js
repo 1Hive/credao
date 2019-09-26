@@ -6,7 +6,6 @@ import DAOLink from '../components/DAOLink'
 import UserContext from '../components/UserContext';
 import { collateCred } from '../utils'
 import { create as createDAO, getAirdropper, airdrop } from '../utils/dao'
-import { auth } from '../utils/auth'
 import { getUserInstallationsByUserId } from '../utils/query'
 import ipfsClient from 'ipfs-http-client'
 
@@ -17,7 +16,7 @@ const Index = (props) => {
   useEffect(()=>{
     if(!user) return
     (async ()=>{
-      setInstallations( await getUserInstallationsByUserId(user.id) )
+      setInstallations( await getUserInstallationsByUserId({jwt: user.jwt, userId: user.id}) )
     })()
   }, [user])
 

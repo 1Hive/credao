@@ -1,6 +1,5 @@
 import React from 'react'
 import App from 'next/app'
-import { auth } from '../utils/auth'
 import UserContext from '../components/UserContext'
 import fetch from 'isomorphic-unfetch'
 
