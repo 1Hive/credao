@@ -157,5 +157,7 @@ GRANT USAGE ON SCHEMA public TO default_role;
 GRANT SELECT, UPDATE(email) ON users TO user_role;
 GRANT SELECT, UPDATE(name, dao, owner_id) ON installations TO user_role;
 GRANT SELECT, UPDATE(address) ON contributors TO user_role;
+REVOKE ALL ON FUNCTION ensure_contributor_from_username(installation_id INTEGER, username VARCHAR) FROM public;
+GRANT EXECUTE ON FUNCTION ensure_contributor_from_username(installation_id INTEGER, username VARCHAR) TO user_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO admin_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO admin_role;
