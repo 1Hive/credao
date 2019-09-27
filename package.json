@@ -6,7 +6,7 @@
   "scripts": {
     "dev": ". ./.env && node server",
     "build": "next build",
-    "build:aragon": "git submodule update --init && cd aragon && yarn && npm run build:local",
+    "build:aragon": "git submodule update --init && cd aragon && yarn && export NODE_ENV=development && npm run build:local",
     "start": ". ./.env && NODE_ENV=production node server",
     "reset": ". ./.env && npm run db:reset && npm run dev",
     "db:drop": ". ./.env && dropdb -h localhost credao",
@@ -21,7 +21,6 @@
   "dependencies": {
     "@aragon/os": "^4.3.0",
     "@graphile-contrib/pg-many-to-many": "^1.0.0-beta.10",
-    "aragon": "ssh://git@github.com:cslarson/aragon.git",
     "base64url": "^3.0.1",
     "bignumber.js": "^9.0.0",
     "connect-pg-simple": "^6.0.1",

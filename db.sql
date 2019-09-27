@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS installations (
   github_token VARCHAR,
   target VARCHAR,
   cred JSON,
-  dao VARCHAR,
+  dao VARCHAR UNIQUE,
   owner_id INTEGER REFERENCES users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

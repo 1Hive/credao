@@ -15,6 +15,7 @@ const {
   getInstallationRepos,
   createInstallation,
   getInstallationByGithubId,
+  getInstallationByDAO,
   getContributor,
   createContributor,
   getContributorAddress
@@ -74,6 +75,20 @@ async function main(){
 
   server.get("/auth", user, async (req, res)=>{
     res.json(req.session.user)
+  })
+
+  server.get("/contributor", user, async (req, res)=>{
+    const dao = req.query.dao
+    const user = req.session.user
+    if(!user || !dao) return res.json(null)
+
+    const installation = await getInstallationByDAO({jwt: user.jwt, dao})
+    const {address, autoAddress, autoKey} = await getContributor({
+      jwt: user.jwt,
+      userId: user.id,
+      installationId: installation.id
+    })
+    res.json({address, autoAddress, autoKey})
   })
 
   server.get("/sign-in", (req, res)=>{

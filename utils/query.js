@@ -11,6 +11,7 @@ module.exports = {
   getInstallationByGithubId,
   getInstallationById,
   getInstallationByName,
+  getInstallationByDAO,
   getInstallationsByTarget,
   updateInstallationCred,
   getContributor,
@@ -90,6 +91,14 @@ async function getInstallationByGithubId({jwt, githubInstallationId}){
       id name target dao cred ownerId } }
   `, {githubId: githubInstallationId})
   return resData && resData.data.installationByGithubId
+}
+
+async function getInstallationByDAO({jwt, dao}){
+  const resData = await gqlSubmit(jwt, `
+    query GetInstallation($dao: String!) { installationByDao(dao: $dao) {
+      id name target dao cred ownerId } }
+  `, {dao})
+  return resData && resData.data.installationByDao
 }
 
 async function getInstallationById({jwt, id}){
