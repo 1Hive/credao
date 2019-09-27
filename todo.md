@@ -1,17 +1,18 @@
-- [ ] secure data access
+- [x] data access control
+- [x] cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
+- [x] host aragon client at /dao
+- [ ] embed wallet functionality in hosted aragon client
+- [ ] cron cred collection
 - [ ] handle org name conflict
 - [ ] allow org name change
 - [ ] map org admins from github
-- [x] cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
-- [ ] cron cred collection
-- [x] host aragon client at /dao
-- [ ] embed wallet functionality in hosted aragon client
 - [ ] upgrade to counterfactual wallets
 - [ ] interface to upgrade from autogen'd key
 - [ ] option to email on cred update
 - [ ] use appropriate github token for cred collection
 - [ ] handle case when not all repos included in installation
 - [ ] import `merklize` from published airdrop module
+- [ ] data security audit
 - [ ] dev documentation
 - [ ] user documentation
 - [ ] ui/design consideration

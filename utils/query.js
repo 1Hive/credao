@@ -8,17 +8,17 @@ module.exports = {
   createInstallation,
   updateInstallationDAO,
   getUserInstallationsByUserId,
-  createContributor,
   getInstallationByGithubId,
   getInstallationById,
   getInstallationByName,
   getInstallationsByTarget,
   updateInstallationCred,
   getContributor,
+  getContributorAddress,
+  createContributor,
   createUser,
   getUserByGithubId,
   getUserByUsername,
-  getContributorAddress,
   gqlSubmit
 }
 
@@ -153,12 +153,12 @@ async function getContributorAddress({jwt, username, installationId}){
   let resData = await gqlSubmit(jwt, `
     mutation EnsureContributor($installationId: Int!, $username: String!) {
       ensureContributorFromUsername(input: {installationId: $installationId, username: $username}) {
-        contributor { address autoAddress autoKey }
+        contributor { userId installationId address autoAddress autoKey }
       }
     }
   `, {username, installationId})
   const contributor = resData.data.ensureContributorFromUsername.contributor
-
+  console.log(contributor)
   return contributor.address || contributor.autoAddress
 }
 

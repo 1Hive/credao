@@ -12,7 +12,10 @@ class CredaoApp extends App {
   componentDidMount = async () => {
     // const urlParams = new URLSearchParams(window.location.search)
     let res = await fetch(`/auth${window.location.search}`)
-    const user = await res.json()
+    let user
+    try{
+      user = await res.json()
+    } catch(e){}
     if (user) this.setState({user})
   }
 

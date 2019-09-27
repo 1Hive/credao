@@ -4,9 +4,10 @@ const next = require("next")
 const { postgraphile } = require("postgraphile")
 const fetch = require("isomorphic-unfetch")
 const PgManyToManyPlugin = require("@graphile-contrib/pg-many-to-many")
-const PostGraphileDerivedFieldPlugin = require("postgraphile-plugin-derived-field")
+// const PostGraphileDerivedFieldPlugin = require("postgraphile-plugin-derived-field")
+const { ProtectAutoKeyPlugin } = require("./plugins")
 const { GH_ACCESS_TOKEN_URL, GH_USER_URL, GH_OAUTH_URL } = require("../utils/constants")
-const derivedFieldDefinitions = require("../utils/derivedFields")
+// const derivedFieldDefinitions = require("../utils/derivedFields")
 const { userJWT, adminJWT, githubJWT} = require("./jwt")
 const {
   getUserByGithubId,
@@ -15,7 +16,8 @@ const {
   createInstallation,
   getInstallationByGithubId,
   getContributor,
-  createContributor
+  createContributor,
+  getContributorAddress
 } = require("../utils/query")
 const targets = require("./targets")
 const githubOAuth = `${GH_OAUTH_URL}?client_id=${process.env.GITHUB_CLIENT_ID}&redirect_uri=http://localhost:4000/setup`
@@ -45,8 +47,7 @@ async function main(){
     graphiql: true,
     enhanceGraphiql: true,
     dynamicJson: true,
-    appendPlugins: [PostGraphileDerivedFieldPlugin, PgManyToManyPlugin],
-    graphileBuildOptions: { derivedFieldDefinitions },
+    appendPlugins: [ProtectAutoKeyPlugin, PgManyToManyPlugin],
     bodySizeLimit: "1MB",
     jwtSecret: process.env.JWT_SECRET,
     pgDefaultRole: "default_role",
@@ -92,6 +93,9 @@ async function main(){
     console.log(`> Ready on ${baseURL}`)
     process.env.BASE_URL = baseURL
     // createUser({jwt: adminJWT, username: `peach-${Math.random().toFixed(4)*10000}`})
+    // createContributor({jwt: adminJWT, userId:1, installationId:1}).then(console.log)
+    // getContributor({jwt: userJWT(999), userId:1, installationId:1}).then(console.log)
+    // getContributorAddress({jwt: userJWT(999), username: 'egg', installationId:1 }).then(console.log)
   })
 
 }

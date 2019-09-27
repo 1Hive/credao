@@ -72,9 +72,10 @@ CREATE TRIGGER installations_new_target
   EXECUTE PROCEDURE notify_new_target();
 
 CREATE TABLE IF NOT EXISTS contributors (
-  installation_id INTEGER REFERENCES installations(id),
-  user_id INTEGER REFERENCES users(id),
+  installation_id INTEGER NOT NULL REFERENCES installations(id),
+  user_id INTEGER NOT NULL REFERENCES users(id),
   address VARCHAR,
+  auto_address VARCHAR,
   auto_key VARCHAR,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -117,8 +118,8 @@ CREATE OR REPLACE FUNCTION ensure_contributor_from_username(
   END;
 $$ language plpgsql strict security definer;
 
--- INSERT INTO users(username) VALUES('peach');
--- INSERT INTO installations(github_id, name, owner_id) VALUES(123, 'anorg', 1);
+INSERT INTO users(username) VALUES('peach');
+INSERT INTO installations(github_id, name, owner_id) VALUES(123, 'anorg', 1);
 -- SELECT ensure_contributor_from_username(1, 'ralph');
 
 CREATE TABLE "session" (
@@ -149,8 +150,7 @@ CREATE POLICY user_users ON users TO user_role USING (id = get_user_id());
 CREATE POLICY user_insert_users ON users FOR INSERT TO user_role WITH CHECK (true);
 CREATE POLICY user_select_installations ON installations FOR SELECT TO user_role USING (true);
 CREATE POLICY user_update_installations ON installations FOR UPDATE TO user_role USING (owner_id = get_user_id());
-CREATE POLICY user_select_contributors ON contributors FOR SELECT TO user_role USING (user_id = get_user_id());
-CREATE POLICY user_insert_contributors ON contributors FOR INSERT TO user_role WITH CHECK (installation_id IN (SELECT id FROM installations WHERE user_id = get_user_id()));
+CREATE POLICY user_select_contributors ON contributors FOR SELECT TO user_role USING (true);
 CREATE POLICY user_update_contributors ON contributors FOR UPDATE TO user_role USING (user_id = get_user_id());
 
 GRANT USAGE ON SCHEMA public TO default_role;
