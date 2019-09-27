@@ -6,6 +6,7 @@
   "scripts": {
     "dev": ". ./.env && node server",
     "build": "next build",
+    "build:aragon": "git submodule update --init && cd aragon && yarn && npm run build",
     "start": ". ./.env && NODE_ENV=production node server",
     "reset": ". ./.env && npm run db:reset && npm run dev",
     "db:drop": ". ./.env && dropdb -h localhost credao",
