@@ -57,7 +57,7 @@ async function main(){
     }
   }))
 
-  server.use("/dao", express.static(`${process.env.PWD}/node_modules/aragon/build`));
+  server.use("/dao", express.static(`${process.env.PWD}/aragon/build`));
 
   server.get("/setup", user, async (req, res)=>{
     // http://localhost:3000/setup?code=A_USER_CODE&installation_id=1884491&setup_action=install
