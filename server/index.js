@@ -14,8 +14,8 @@ const {
   getInstallationRepos,
   createInstallation,
   getInstallationByGithubId,
-  getInstallationUser,
-  createInstallationUser
+  getContributor,
+  createContributor
 } = require("../utils/query")
 const targets = require("./targets")
 const githubOAuth = `${GH_OAUTH_URL}?client_id=${process.env.GITHUB_CLIENT_ID}&redirect_uri=http://localhost:4000/setup`
@@ -114,11 +114,11 @@ async function getInstallation({userId, githubInstallationId}){
   }
 
   const installationId = installation.id
-  let installationUser = await getInstallationUser({jwt, userId, installationId})
+  let contributor = await getContributor({jwt, userId, installationId})
 
-  if(!installationUser)
-    installationUser = await createInstallationUser({jwt, userId, installationId})
-  console.log("installationUser", installationUser)
+  if(!contributor)
+    contributor = await createContributor({jwt, userId, installationId})
+  console.log("contributor", contributor)
 
   return installation
 }

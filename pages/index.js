@@ -16,7 +16,7 @@ const Index = (props) => {
   useEffect(()=>{
     if(!user) return
     (async ()=>{
-      setInstallations( await getUserInstallationsByUserId({jwt: user.jwt, userId: user.id}) )
+      setInstallations( await getUserInstallationsByUserId({jwt: user.jwt, id: user.id}) )
     })()
   }, [user])
 

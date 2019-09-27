@@ -2,7 +2,7 @@ import { abi as TemplateABI } from "../../1hive/airdrop/build/contracts/Template
 import { abi as AirdropABI } from "../../1hive/airdrop/build/contracts/Airdrop.json"
 import { abi as KernelABI } from "@aragon/os/build/contracts/Kernel.json"
 import { ethers } from "ethers"
-import { getInstallationUser, getInstallationUserAddress, updateInstallationDAO } from "./query"
+import { getContributor, getContributorAddress, updateInstallationDAO } from "./query"
 import { gasTopup } from './'
 const templateAddress = "0xD13a7D8A728692eB2c56135B5EB5A1951b3F8395"
 const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
@@ -13,7 +13,7 @@ let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
 let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
 
 export async function create({jwt, userId, installationId}, createCallback){
-  let { autoKey, installationByInstallationId: { name } } = await getInstallationUser({jwt, userId, installationId})
+  let { autoKey, installationByInstallationId: { name } } = await getContributor({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
 
   if((await wallet.getBalance()).isZero())
@@ -34,12 +34,12 @@ export async function create({jwt, userId, installationId}, createCallback){
 }
 
 export async function airdrop({jwt, userId, installationId, diff}, droppedCallback){
-  let { autoKey, installationByInstallationId: { dao } } = await getInstallationUser({jwt, userId, installationId})
+  let { autoKey, installationByInstallationId: { dao } } = await getContributor({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
 
   diff.cred = await Promise.all(diff.cred.map(
-    async c=>( { ...c, address: await getInstallationUserAddress({jwt, username: c.username, installationId}) } )
+    async c=>( { ...c, address: await getContributorAddress({jwt, username: c.username, installationId}) } )
   ))
 
   let merklized = merklize("some_id", diff.cred, diff.start, diff.end)

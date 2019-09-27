@@ -8,17 +8,17 @@ module.exports = {
   createInstallation,
   updateInstallationDAO,
   getUserInstallationsByUserId,
-  createInstallationUser,
+  createContributor,
   getInstallationByGithubId,
   getInstallationById,
   getInstallationByName,
   getInstallationsByTarget,
   updateInstallationCred,
-  getInstallationUser,
+  getContributor,
   createUser,
   getUserByGithubId,
   getUserByUsername,
-  getInstallationUserAddress,
+  getContributorAddress,
   gqlSubmit
 }
 
@@ -38,12 +38,13 @@ async function getInstallationRepos(ghToken){
   return repos
 }
 
-async function createInstallation({jwt, userId, githubInstallationId, githubToken, name, target, ownerId}){
+async function createInstallation({jwt, githubInstallationId, githubToken, name, target, ownerId}){
   let resData = await gqlSubmit(jwt, `
-    mutation { createInstallation( input: {
-          installation: { githubId: ${githubInstallationId}, githubToken: "${githubToken}",
-            name: "${name}", target: "${target}", ownerId: ${ownerId} } }
-    ) { installation { id name target ownerId } } }`)
+    mutation CreateInstallation($githubId: Int!, $githubToken: String!, $name: String!, $target: String!, $ownerId: Int!) {
+      createInstallation( input: {
+          installation: { githubId: $githubId, githubToken: $githubToken, name: $name, target: $target, ownerId: $ownerId } }
+    ) { installation { id name target ownerId } } }
+  `, {githubId: githubInstallationId, githubToken, name, target, ownerId})
   return resData && resData.data.createInstallation.installation
 }
 
@@ -65,18 +66,22 @@ async function updateInstallationCred({jwt, id, cred}){
   return resData && resData.data.updateInstallationById.installation
 }
 
-async function getUserInstallationsByUserId({jwt, userId}){
-  const resData = await gqlSubmit(jwt, `query { userById(id: ${userId}) { id
-      installationsByInstallationUserUserIdAndInstallationId {
-        nodes { id name target dao cred ownerId } } } }`)
-  return resData && resData.data.userById.installationsByInstallationUserUserIdAndInstallationId.nodes
+async function getUserInstallationsByUserId({jwt, id}){
+  const resData = await gqlSubmit(jwt, `
+    query GetUserInstallations($id: Int!) { userById(id: $id) { id
+      installationsByContributorUserIdAndInstallationId {
+        nodes { id name target dao cred ownerId } } } }
+  `, {id})
+  return resData && resData.data.userById.installationsByContributorUserIdAndInstallationId.nodes
 }
 
-async function createInstallationUser({jwt, userId, installationId}){
-  const resData = await gqlSubmit(jwt, `mutation {
-    createInstallationUser( input: { installationUser: { userId: ${userId}, installationId: ${installationId} } } ) {
-      installationUser { userId installationId address autoAddress autoKey } } }`)
-  return resData && resData.data.createInstallationUser.installationUser
+async function createContributor({jwt, userId, installationId}){
+  const resData = await gqlSubmit(jwt, `
+    mutation CreateContributor($userId: Int!, $installationId: Int!) {
+      createContributor( input: { contributor: { userId: $userId, installationId: $installationId } } ) {
+        contributor { userId installationId address autoAddress autoKey } } }
+  `, {userId, installationId})
+  return resData && resData.data.createContributor.contributor
 }
 
 async function getInstallationByGithubId({jwt, githubInstallationId}){
@@ -109,14 +114,14 @@ async function getInstallationsByTarget({jwt, target}){
   return resData && resData.data.allInstallations.nodes
 }
 
-async function getInstallationUser({jwt, userId, installationId}){
+async function getContributor({jwt, userId, installationId}){
   const resData = await gqlSubmit(jwt, `
-    query GetInstallationUser($userId: Int!, $installationId: Int!) {
-      installationUserByInstallationIdAndUserId(userId: $userId, installationId: $installationId) {
+    query GetContributor($userId: Int!, $installationId: Int!) {
+      contributorByInstallationIdAndUserId(userId: $userId, installationId: $installationId) {
         userId installationId address autoAddress autoKey
         installationByInstallationId { name dao } } }
   `, {userId, installationId})
-  return resData && resData.data.installationUserByInstallationIdAndUserId
+  return resData && resData.data.contributorByInstallationIdAndUserId
 }
 
 async function createUser({jwt, githubId, username}){
@@ -144,23 +149,17 @@ async function getUserByUsername({jwt, username}){
   return resData && resData.data.userByUsername
 }
 
-async function getInstallationUserAddress({jwt, username, installationId}){
+async function getContributorAddress({jwt, username, installationId}){
   let resData = await gqlSubmit(jwt, `
-    mutation MyMutation($installationId: Int!, $login: String!) {
-      createInstallationUserFromLogin(input: {installationId: $installationId, login: $login}) {
-        clientMutationId
+    mutation EnsureContributor($installationId: Int!, $username: String!) {
+      ensureContributorFromUsername(input: {installationId: $installationId, username: $username}) {
+        contributor { address autoAddress autoKey }
       }
     }
-  `, {login: username, installationId})
-  // console.log({jwt, username, installationId)
-  // let user = await getUserByUsername({jwt, username})
-  // if(!user) user = await createUser({jwt, username})
-  //
-  // let installationUser = await getInstallationUser({jwt, userId: user.id, installationId})
-  // if(!installationUser) installationUser = await createInstallationUser({jwt, userId: user.id, installationId})
-  const installationUser = resData.data.createInstallationUserFromLogin
+  `, {username, installationId})
+  const contributor = resData.data.ensureContributorFromUsername.contributor
 
-  return installationUser.address || installationUser.autoAddress
+  return contributor.address || contributor.autoAddress
 }
 
 async function gqlSubmit(jwt, query, variables){
