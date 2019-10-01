@@ -65,8 +65,10 @@ function InstallationDetail(props){
         <React.Fragment>
           <Notification icon={<Deploy />} status='ok' message='New cred is available' />
           <Paragraph>
+            {!dropped && <Button icon={<Deploy />} label="airdrop cred" onClick={()=>airdrop({jwt: user.jwt, diff, userId: user.id, installationId: props.id}, setDropped)} />}
+          </Paragraph>
+          <Paragraph>
             <Button label={showCred ? 'hide cred' : 'show cred'} onClick={()=>setShowCred(!showCred)} />
-            {!dropped && <Button label="airdrop cred" onClick={()=>airdrop({jwt: user.jwt, diff, userId: user.id, installationId: props.id}, setDropped)} />}
           </Paragraph>
           {showCred && <CredDiff {...diff} />}
         </React.Fragment>
