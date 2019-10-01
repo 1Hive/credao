@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
-import { Anchor, Box, Button, Heading, Paragraph, Text } from 'grommet'
+import { Anchor, Box, Button, Grid, Heading, Paragraph, Text } from 'grommet'
 import { Card } from 'grommet-controls'
 import { SettingsOption } from 'grommet-icons';
 import Loading from '../components/Loading'
@@ -27,10 +27,14 @@ const Index = (props) => {
     <Layout>
       <Paragraph>{user ? `Welcome, ${user.username}` : `please login`}</Paragraph>
       {installations && installations.length ?
-        <Box>
+        <React.Fragment>
           <Heading level={3}>Your organizations:</Heading>
-          {installations.map(i=><InstallationCard key={i.id} {...i} />)}
-        </Box>
+          <Grid columns={{ count: 'fill', size: ['small', 'medium'] }} rows="small" gap={{ row: 'medium' }}>
+            {installations.map(i=><InstallationCard key={i.id} {...i} />)}
+          </Grid>
+          <Box direction='row' justify="center">
+          </Box>
+        </React.Fragment>
         : null
       }
     </Layout>
