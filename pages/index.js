@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
+import { Anchor, Box, Button, Heading, Paragraph, Text } from 'grommet'
+import { Card } from 'grommet-controls'
+import { SettingsOption } from 'grommet-icons';
 import Loading from '../components/Loading'
 import Layout from '../components/Layout'
-import DAOLink from '../components/DAOLink'
 import UserContext from '../components/UserContext';
+import InstallationCard from '../components/InstallationCard';
 import { collateCred } from '../utils'
 import { create as createDAO, getAirdropper, airdrop } from '../utils/dao'
 import { getUserInstallationsByUserId } from '../utils/query'
@@ -22,21 +25,12 @@ const Index = (props) => {
 
   return (
     <Layout>
-      <p>{user ? `Welcome, ${user.username}` : `please login`}</p>
+      <Paragraph>{user ? `Welcome, ${user.username}` : `please login`}</Paragraph>
       {installations && installations.length ?
-        <React.Fragment>
-          <p>Your organizations:</p>
-          <table>
-            <tbody>
-              {installations.map(i=>(
-                <tr key={i.id}>
-                  <td><Link href='/org/[name]' as={`/org/${i.name}`}><a>{i.name}</a></Link></td>
-                  <td>{i.dao ? <DAOLink dao={i.dao}>visit dao</DAOLink> : 'no dao'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </React.Fragment>
+        <Box>
+          <Heading level={3}>Your organizations:</Heading>
+          {installations.map(i=><InstallationCard key={i.id} {...i} />)}
+        </Box>
         : null
       }
     </Layout>

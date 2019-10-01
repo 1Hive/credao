@@ -1,7 +1,7 @@
 - [x] data access control
 - [x] cred diffs - pull most recent dao-accepted cred from ipfs and offer any new cred as a diff
 - [x] host aragon client at /dao
-- [ ] embed wallet functionality in hosted aragon client
+- [x] embed wallet functionality in hosted aragon client
 - [ ] cron cred collection
 - [ ] handle org name conflict
 - [ ] allow org name change
