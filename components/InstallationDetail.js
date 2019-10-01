@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import { Anchor, Box, Button, Heading, Paragraph, Text } from 'grommet'
 import { Card, Notification } from 'grommet-controls'
-import { Deploy } from 'grommet-icons';
+import { Deploy, Group } from 'grommet-icons';
 import Loading from './Loading'
 import Layout from './Layout'
 import UserContext from './UserContext';
@@ -52,7 +52,7 @@ function InstallationDetail(props){
       {dao &&
         <Paragraph>
           <Link href={`/dao/#/${dao}`}>
-            <a target="_blank"><Button label="use dao" /></a>
+            <a target="_blank"><Button icon={<Group />} label="use dao" /></a>
           </Link>
         </Paragraph>
       }
