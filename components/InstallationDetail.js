@@ -40,7 +40,7 @@ function InstallationDetail(props){
   useEffect(()=>{
     if(!count || !cred) return
     if(count.isZero()) return setDiff(collateCred({raw: props.cred}))
-    else if(latest) return setDiff(collateCred({raw: props.cred, after: latest.data.end}))
+    else if(latest) return setDiff(collateCred({raw: props.cred, after: latest.data.interval.end}))
   }, [cred, count, latest])
 
   return (
@@ -56,7 +56,7 @@ function InstallationDetail(props){
       {!dao && <CreateDAO installationId={props.id} onDao={setDao} />}
       {dao && count === undefined && <Notification status="info" icon={<Spinning kind="pulse" />} message="retreiving org details" />}
       {count !== undefined && <Paragraph>{`there ${count.toNumber() === 1 ? 'has' : 'have'} been ${count} cred-drop${count.toNumber() === 1 ? '' : 's'}`}</Paragraph>}
-      {latest && <Paragraph>{`the most recent cred-drop covers activity till ${new Date(latest.data.end).toDateString()}`}</Paragraph>}
+      {latest && <Paragraph>{`the most recent cred-drop covers activity till ${new Date(latest.data.interval.end).toDateString()}`}</Paragraph>}
       {!cred && <Paragraph>cred has not been collected yet</Paragraph>}
       {diff &&
         <React.Fragment>

@@ -1,0 +1,56 @@
+{
+	"name": "@1hive/cred",
+	"version": "0.0.1",
+	"description": "",
+	"dependencies": {
+		"@aragon/api": "^2.0.0-beta.6",
+		"@aragon/api-react": "^2.0.0-beta.6",
+		"@aragon/apps-shared-minime": "^1.0.2",
+		"@aragon/apps-token-manager": "^2.1.0",
+		"@aragon/os": "^4.3.0",
+		"@aragon/templates-shared": "^1.0.0",
+		"@aragon/ui": "^0.40.2",
+		"bignumber.js": "^9.0.0",
+		"core-js": "^3.1.4",
+		"csvtojson": "^2.0.10",
+		"ipfs-http-client": "^32.0.1",
+		"merkle-tree-solidity": "^1.0.8",
+		"multihashes": "^0.4.14",
+		"react": "^16.8.6",
+		"react-dom": "^16.8.6",
+		"regenerator-runtime": "^0.13.2",
+		"rxjs": "^6.5.2",
+		"styled-components": "^4.3.2"
+	},
+	"devDependencies": {
+		"@aragon/apps-shared-migrations": "^1.0.0",
+		"@aragon/cli": "^6.2.6",
+		"@aragon/test-helpers": "^1.1.0",
+		"@babel/core": "^7.6.0",
+		"@babel/plugin-proposal-class-properties": "^7.5.5",
+		"@babel/preset-env": "^7.6.0",
+		"homedir": "^0.6.0",
+		"parcel-bundler": "^1.12.3"
+	},
+	"scripts": {
+		"start": "aragon run",
+		"start:template": "npm run start -- --template Template --template-init @ARAGON_ENS --template-args @daonuts --files dist",
+		"start:http": "aragon run --http localhost:8001 --http-served-from ./dist",
+		"start:http:template": "npm run start:http -- --template Template --template-init @ARAGON_ENS",
+		"deploy:template": "aragon deploy Template --init @ARAGON_ENS",
+		"test": "aragon contracts test",
+		"compile": "aragon contracts compile",
+		"sync-assets": "copy-aragon-ui-assets -n aragon-ui ./dist",
+		"build:app": "parcel build app/index.html -d dist/ --public-url '.' --no-cache",
+		"build:script": "parcel build app/src/script.js -d dist/ --no-cache",
+		"build": "npm run sync-assets && npm run build:app && npm run build:script",
+		"publish:patch": "aragon apm publish patch --files dist --skip-confirmation",
+		"publish:minor": "aragon apm publish minor --files dist --skip-confirmation",
+		"publish:major": "aragon apm publish major --files dist --skip-confirmation",
+		"versions": "aragon apm versions",
+		"clean": "rm -rf build && rm -rf dist"
+	},
+	"browserslist": [
+		"last 2 Chrome versions"
+	]
+}

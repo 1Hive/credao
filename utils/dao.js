@@ -6,10 +6,11 @@ const { getContributor, getContributorAddress, updateInstallationDAO } = require
 const { gasTopup } = require('./')
 const merklize = require('./merklize')
 const ipfsClient = require('ipfs-http-client')
+const namehash = require('eth-ens-namehash').hash
 
-let templateAddress = "0xE6D1497b94372F6A297cC084d1ec41A53Aa19179"
-const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
-const airdropAppId = "0x9de6599338eae7c86e73fdfe876b54eb1c3c4c67db74ee25a60bc07f72576feb"
+let templateAddress = "0xeA86dE2e0C586456975319003Fc8C4AA9c7EE011"
+const credAppId = namehash('cred-app.open.aragonpm.eth')
+// const airdropAppId = "0x9de6599338eae7c86e73fdfe876b54eb1c3c4c67db74ee25a60bc07f72576feb"
 let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
 let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
 
@@ -67,7 +68,7 @@ async function getAirdropper({dao, wallet}){
 
   return await new Promise((resolve, reject)=>{
     kernel.on("NewAppProxy", (proxy, upgradeable, appId, e)=>{
-      if(appId === airdropAppId){
+      if(appId === credAppId){
         kernel.removeListener("NewAppProxy")
         resolve(new ethers.Contract(proxy, AirdropABI, wallet || provider))
       }

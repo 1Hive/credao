@@ -1,0 +1,42 @@
+{
+  "roles": [
+    {
+      "name": "Start a new distribution",
+      "id": "START_ROLE",
+      "params": [
+        "Merkle root",
+        "Content URI"
+      ]
+    },
+    {
+      "name": "Change source",
+      "id": "CHANGE_SOURCE",
+      "params": [
+        "Source"
+      ]
+    }
+  ],
+  "environments": {
+    "default": {
+      "network": "development",
+      "appName": "cred-app.open.aragonpm.eth"
+    },
+    "docker": {
+      "network": "docker",
+      "appName": "cred-app.open.aragonpm.eth"
+    },
+    "rinkeby": {
+      "registry": "0x98df287b6c145399aaa709692c8d308357bc085d",
+      "appName": "cred-app.open.aragonpm.eth",
+      "wsRPC": "wss://rinkeby.eth.aragon.network/ws",
+      "network": "rinkeby"
+    },
+    "mainnet": {
+      "registry": "0x314159265dd8dbb310642f98f50c066173c1259b",
+      "appName": "cred-app.open.aragonpm.eth",
+      "wsRPC": "wss://mainnet.eth.aragon.network/ws",
+      "network": "mainnet"
+    }
+  },
+  "path": "contracts/Cred.sol"
+}
