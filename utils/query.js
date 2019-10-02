@@ -53,7 +53,7 @@ async function updateInstallationDAO({jwt, id, dao}){
   let resData = await gqlSubmit(jwt, `
     mutation UpdateInstallation($id: Int!, $dao: String!) {
       updateInstallationById(input: {installationPatch: {dao: $dao}, id: $id}) {
-        clientMutationId } }
+        installation { id name target dao cred ownerId } } }
   `, {id, dao})
   return resData && resData.data.updateInstallationById.installation
 }
@@ -61,7 +61,7 @@ async function updateInstallationDAO({jwt, id, dao}){
 async function updateInstallationCred({jwt, id, cred}){
   let resData = await gqlSubmit(jwt, `
     mutation UpdateCred($cred: JSON!) { updateInstallationById(input: { installationPatch: { cred: $cred }, id: ${id} }) {
-        clientMutationId } }`
+        installation { id name target dao cred ownerId } } }`
   , {cred})
   console.log(resData)
   return resData && resData.data.updateInstallationById.installation
@@ -128,7 +128,7 @@ async function getContributor({jwt, userId, installationId}){
     query GetContributor($userId: Int!, $installationId: Int!) {
       contributorByInstallationIdAndUserId(userId: $userId, installationId: $installationId) {
         userId installationId address autoAddress autoKey
-        installationByInstallationId { name dao } } }
+        installationByInstallationId { name dao target } } }
   `, {userId, installationId})
   return resData && resData.data.contributorByInstallationIdAndUserId
 }

@@ -1,16 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react'
 import Link from 'next/link'
 import { Anchor, Box, Button, Heading, Paragraph, Text } from 'grommet'
-import { Card, Notification } from 'grommet-controls'
+import { Card, Notification, Spinning } from 'grommet-controls'
 import { Deploy, Group } from 'grommet-icons';
-import Loading from './Loading'
-import Layout from './Layout'
 import UserContext from './UserContext';
 import CreateDAO from './CreateDAO';
 import CredDiff from './CredDiff';
 import { collateCred, ipfsFetch } from '../utils'
-import { getInstallationByName } from '../utils/query'
-import { create as createDAO, getAirdropper, airdrop }  from '../utils/dao'
+import { createDAO, getAirdropper, airdrop }  from '../utils/dao'
 
 function InstallationDetail(props){
   const { user } = useContext(UserContext)
@@ -57,7 +54,7 @@ function InstallationDetail(props){
         </Paragraph>
       }
       {!dao && <CreateDAO installationId={props.id} onDao={setDao} />}
-      {dao && count === undefined && <Loading>retreiving org details</Loading>}
+      {dao && count === undefined && <Notification status="info" icon={<Spinning kind="pulse" />} message="retreiving org details" />}
       {count !== undefined && <Paragraph>{`there ${count.toNumber() === 1 ? 'has' : 'have'} been ${count} cred-drop${count.toNumber() === 1 ? '' : 's'}`}</Paragraph>}
       {latest && <Paragraph>{`the most recent cred-drop covers activity till ${new Date(latest.data.end).toDateString()}`}</Paragraph>}
       {!cred && <Paragraph>cred has not been collected yet</Paragraph>}

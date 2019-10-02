@@ -5,7 +5,7 @@ import { Card } from 'grommet-controls'
 import { Deploy, Group, SettingsOption } from 'grommet-icons';
 import UserContext from './UserContext';
 import CreateDAO from './CreateDAO';
-import { create as createDAO, getAirdropper, airdrop }  from '../utils/dao'
+import { createDAO, getAirdropper, airdrop }  from '../utils/dao'
 
 function InstallationCard(props) {
 

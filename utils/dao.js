@@ -1,39 +1,47 @@
-import { abi as TemplateABI } from "../../1hive/airdrop/build/contracts/Template.json"
-import { abi as AirdropABI } from "../../1hive/airdrop/build/contracts/Airdrop.json"
-import { abi as KernelABI } from "@aragon/os/build/contracts/Kernel.json"
-import { ethers } from "ethers"
-import { getContributor, getContributorAddress, updateInstallationDAO } from "./query"
-import { gasTopup } from './'
-const templateAddress = "0xD13a7D8A728692eB2c56135B5EB5A1951b3F8395"
+const TemplateABI = require("../../1hive/airdrop/build/contracts/Template.json").abi
+const AirdropABI = require("../../1hive/airdrop/build/contracts/Airdrop.json").abi
+const KernelABI = require("@aragon/os/build/contracts/Kernel.json").abi
+const { ethers } = require("ethers")
+const { getContributor, getContributorAddress, updateInstallationDAO } = require("./query")
+const { gasTopup } = require('./')
+const merklize = require('./merklize')
+const ipfsClient = require('ipfs-http-client')
+
+let templateAddress = "0xE6D1497b94372F6A297cC084d1ec41A53Aa19179"
 const SAMPLE_MNEMONIC = "explain tackle mirror kit van hammer degree position ginger unfair soup bonus"
 const airdropAppId = "0x9de6599338eae7c86e73fdfe876b54eb1c3c4c67db74ee25a60bc07f72576feb"
-import merklize from './merklize'
-import ipfsClient from 'ipfs-http-client'
 let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
 let ipfs = ipfsClient('/ip4/127.0.0.1/tcp/5001')
 
-export async function create({jwt, userId, installationId}, createCallback){
-  let { autoKey, installationByInstallationId: { name } } = await getContributor({jwt, userId, installationId})
+module.exports = {
+  createDAO,
+  airdrop,
+  getAirdropper
+}
+
+async function createDAO({jwt, userId, installationId}){
+  let { autoKey, installationByInstallationId: { name, target } } = await getContributor({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
 
   if((await wallet.getBalance()).isZero())
     await gasTopup(wallet.address)
 
-  let template = new ethers.Contract(templateAddress, TemplateABI, wallet)
+  const template = new ethers.Contract(templateAddress, TemplateABI, wallet)
+  console.log("target", target)
+  const tx = await template.newInstance(target, {gasLimit: 7000000})
+  await tx.wait()
 
-  template.on("DeployDao", async (dao, e)=>{
-    if(e.transactionHash === tx.hash){
-      template.removeListener("DeployDao")
-      await updateInstallationDAO({jwt, id: installationId, dao})
-      createCallback(dao)
-    }
+  return new Promise((resolve, reject)=>{
+    template.on("DeployDao", async (dao, e)=>{
+      if(e.transactionHash === tx.hash){
+        template.removeListener("DeployDao")
+        resolve(dao)
+      }
+    })
   })
-
-  let tx = await template.newInstance({gasLimit: 7000000})
-  return await tx.wait()
 }
 
-export async function airdrop({jwt, userId, installationId, diff}, droppedCallback){
+async function airdrop({jwt, userId, installationId, diff}, droppedCallback){
   let { autoKey, installationByInstallationId: { dao } } = await getContributor({jwt, userId, installationId})
   let wallet = (new ethers.Wallet(autoKey)).connect(provider)
   let airdropper = await getAirdropper({dao, wallet})
@@ -52,7 +60,7 @@ export async function airdrop({jwt, userId, installationId, diff}, droppedCallba
   droppedCallback(true)
 }
 
-export async function getAirdropper({dao, wallet}){
+async function getAirdropper({dao, wallet}){
   let kernel = new ethers.Contract(dao, KernelABI, provider)
 
   provider.resetEventsBlock(await kernel.getInitializationBlock())

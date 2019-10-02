@@ -1,8 +1,15 @@
-import fetch from 'isomorphic-unfetch'
-import { ethers } from "ethers"
+const fetch = require('isomorphic-unfetch')
+const { ethers } = require("ethers")
 const SAMPLE_PRIVATE_KEY = "a8a54b2d8197bc0b19bb8a084031be71835580a01e70a45a13babd16c9bc1563"
 
-export function collateCred({raw, after}){
+module.exports = {
+  collateCred,
+  timeout,
+  gasTopup,
+  ipfsFetch
+}
+
+function collateCred({raw, after}){
   let startIdx = 0
   if(after){
     // after = 1566691200000
@@ -29,11 +36,11 @@ export function collateCred({raw, after}){
   }
 }
 
-export async function timeout(ms){
+async function timeout(ms){
   return await new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export async function gasTopup(to){
+async function gasTopup(to){
   let provider = new ethers.providers.JsonRpcProvider("http://localhost:8545")
   let wallet = (new ethers.Wallet(SAMPLE_PRIVATE_KEY)).connect(provider)
   let value = ethers.utils.parseEther('0.1')
@@ -41,7 +48,7 @@ export async function gasTopup(to){
   await tx.wait()
 }
 
-export async function ipfsFetch(hash){
+async function ipfsFetch(hash){
   let ipfsGateway = location.hostname === 'localhost' ? 'http://localhost:8080/ipfs' : 'https://ipfs.eth.aragon.network/ipfs'
   return await fetch(`${ipfsGateway}/${hash}`)
 }
