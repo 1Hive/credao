@@ -37,9 +37,9 @@ node ${process.env.SOURCECRED_BIN} load ${target}`
 
   console.log('\n\stdout:\n', stdout)
 
-  const cred = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`))
+  // const cred = JSON.parse(await readFile(`${process.env.SOURCECRED_OUTPUT}/projects/${base64url.encode(target)}/cred.json`))
 
-  let installations = await getInstallationsByTarget({jwt: adminJWT, target})
-  let res = await Promise.all(installations.map(async ({id})=>await updateInstallationCred({jwt: adminJWT, id, cred})))
+  // let installations = await getInstallationsByTarget({jwt: adminJWT, target})
+  // let res = await Promise.all(installations.map(async ({id})=>await updateInstallationCred({jwt: adminJWT, id, cred})))
 
 }

@@ -118,8 +118,8 @@ CREATE OR REPLACE FUNCTION ensure_contributor_from_username(
   END;
 $$ language plpgsql strict security definer;
 
-INSERT INTO users(username) VALUES('peach');
-INSERT INTO installations(github_id, name, owner_id) VALUES(123, 'anorg', 1);
+-- INSERT INTO users(username) VALUES('peach');
+-- INSERT INTO installations(github_id, name, owner_id) VALUES(123, 'anorg', 1);
 -- SELECT ensure_contributor_from_username(1, 'ralph');
 
 CREATE TABLE "session" (

@@ -2,7 +2,6 @@
   "name": "credao",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": ". ./.env && node server",
     "build": "next build",
