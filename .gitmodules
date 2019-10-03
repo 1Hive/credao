@@ -1,3 +1,4 @@
 [submodule "aragon"]
 	path = aragon
 	url = git@github.com:1Hive/aragon.git
+	branch = credao

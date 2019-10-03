@@ -1,5 +1,5 @@
-const TemplateABI = require("../../1hive/airdrop/build/contracts/Template.json").abi
-const AirdropABI = require("../../1hive/airdrop/build/contracts/Airdrop.json").abi
+const TemplateABI = require("../cred-app/build/contracts/Template.json").abi
+const AirdropABI = require("../cred-app/build/contracts/Cred.json").abi
 const KernelABI = require("@aragon/os/build/contracts/Kernel.json").abi
 const { ethers } = require("ethers")
 const { getContributor, getContributorAddress, updateInstallationDAO } = require("./query")

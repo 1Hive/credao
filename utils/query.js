@@ -1,6 +1,5 @@
 const fetch = require('isomorphic-unfetch')
 const { ethers } = require("ethers")
-const parseLinkHeader = require('parse-link-header')
 const { GH_INSTALLATION_REPOS_URL, GH_ACCESS_TOKEN_URL, GH_USER_URL } = require('./constants')
 
 module.exports = {
