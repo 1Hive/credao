@@ -11,12 +11,12 @@ api.store(
     console.log("distribution", event, state)
 
     switch (event.event) {
-      case 'Started':
+      case 'Start':
         let distribution = await marshalDistribution(parseInt(event.returnValues.id, 10))
         console.log("started", event.returnValues.id)
         newState = {...state, distributions: [distribution].concat((state && state.distributions) || []) }
         break
-      case 'Received':
+      case 'Award':
         newState = {...state}
         break
       default:
