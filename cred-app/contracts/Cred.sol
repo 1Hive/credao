@@ -15,8 +15,8 @@ contract Cred is AragonApp {
     }
 
     /// Events
-    event Started(uint id);
-    event Received(uint id, address recipient, uint amount);
+    event Start(uint id);
+    event Award(uint id, address recipient, uint amount);
 
     /// State
     mapping(uint => Distribution) public distributions;
@@ -56,7 +56,7 @@ contract Cred is AragonApp {
     function _start(bytes32 _root, string _dataURI) internal returns(uint id){
         id = ++distributionsCount;    // start at 1
         distributions[id] = Distribution(_root, _dataURI);
-        emit Started(id);
+        emit Start(id);
     }
 
     /**
@@ -88,7 +88,7 @@ contract Cred is AragonApp {
 
         tokenManager.mint(_recipient, _amount);
 
-        emit Received(_id, _recipient, _amount);
+        emit Award(_id, _recipient, _amount);
     }
 
     function extractProof(bytes _proofs, uint _marker, uint proofLength) public pure returns (bytes32[] proof) {
@@ -125,7 +125,7 @@ contract Cred is AragonApp {
      * @param _id Distribution id
      * @param _recipient Recipient to check
      */
-    function received(uint _id, address _recipient) public view returns(bool) {
+    function awarded(uint _id, address _recipient) public view returns(bool) {
         /* return _id <= lastClaimed[_recipient]; */
         return distributions[_id].received[_recipient];
     }
