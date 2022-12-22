@@ -40,7 +40,7 @@
     "grommet-icons": "^4.3.0",
     "ipfs-http-client": "^36.0.0",
     "isomorphic-unfetch": "^3.0.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "merkle-tree-solidity": "^1.0.8",
     "mkdirp": "^0.5.1",
     "next": "^9.0.5",
